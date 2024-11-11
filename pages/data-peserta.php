@@ -28,7 +28,11 @@ checkAuth();
   <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  
+  <!-- DataTables CSS -->
+  <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -64,7 +68,7 @@ checkAuth();
               <p class="text-dark">Berikut adalah daftar peserta yang terdaftar dalam sistem.</p>
               <!-- Fetch data peserta dari db -->
               <div class="table-responsive">
-                <table class="table datatable" id="participantTable">
+                <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
                 <thead>
                   <tr>
                     <th>First Name</th>
@@ -154,7 +158,7 @@ checkAuth();
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer brand-bg-color">
     <div class="copyright text-light">
-      &copy; Copyright <strong><span>WorkSmart</span></strong>. All Rights Reserved
+      © Copyright <strong><span>WorkSmart</span></strong>. All Rights Reserved
     </div>
   </footer><!-- End Footer -->
 
@@ -166,25 +170,70 @@ checkAuth();
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
   <script src="assets/vendor/echarts/echarts.min.js"></script>
   <script src="assets/vendor/quill/quill.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
+  
+  <!-- DataTables JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
   <script src="assets/js/autohide.js"></script>
 
-  <!-- Add this JavaScript code before closing body tag -->
+  <!-- Initialize DataTable -->
   <script>
-    const dataTable = new simpleDatatables.DataTable("#participantTable", {
-      searchable: true,
-      fixedHeight: true,
-      perPage: 10,
-      drawCallback: function() {
-        hideLoading();
-      },
-      preDrawCallback: function() {
-        showLoading();
-      }
+    $(document).ready(function() {
+      $('#participantTable').DataTable({
+        responsive: true,
+        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+             '<"row"<"col-sm-12"tr>>' +
+             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        buttons: [
+          {
+            extend: 'copy',
+            className: 'btn btn-sm btn-primary'
+          },
+          {
+            extend: 'excel',
+            className: 'btn btn-sm btn-success'
+          },
+          {
+            extend: 'pdf',
+            className: 'btn btn-sm btn-danger'
+          },
+          {
+            extend: 'print',
+            className: 'btn btn-sm btn-info'
+          }
+        ],  
+        language: {
+          search: "_INPUT_",
+          searchPlaceholder: "Search records...",
+          lengthMenu: "_MENU_ records per page",
+          info: "Showing _START_ to _END_ of _TOTAL_ entries",
+          paginate: {
+            first: '<i class="bi bi-chevron-double-left"></i>',
+            previous: '<i class="bi bi-chevron-left"></i>',
+            next: '<i class="bi bi-chevron-right"></i>',
+            last: '<i class="bi bi-chevron-double-right"></i>'
+          }
+        },
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        order: [[0, 'asc']],
+        drawCallback: function() {
+          $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+        }
+      });
     });
   </script>
 

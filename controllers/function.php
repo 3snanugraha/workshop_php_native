@@ -239,5 +239,25 @@ function getMonthlyParticipants() {
     return $monthlyParticipants;
 }
 
+// Fungsi untuk mengambil acara dari database
+function getEvents() {
+    require '../databases/database.php';
+    
+    $sql = "SELECT title, start_date AS start, end_date AS end FROM workshops WHERE status = 'active'";
+    $result = $conn->query($sql);
 
+    $events = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $events[] = [
+                'title' => $row['title'],
+                'start' => $row['start'],
+                'end' => $row['end']
+            ];
+        }
+    }
+
+    return $events;
+}
 ?>

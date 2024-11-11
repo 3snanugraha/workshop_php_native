@@ -166,7 +166,7 @@ $monthlyParticipants = getMonthlyParticipants();
             </div><!-- End Mentors Card -->
 
             <!-- Participants Chart -->
-            <div class="col-8">
+            <div class="col-md-8">
               <div class="card">
 
                 <div class="filter">
@@ -193,7 +193,7 @@ $monthlyParticipants = getMonthlyParticipants();
             </div>
             <!-- End Participants Chart -->
 
-            <div class="col-4">
+            <div class="col-md-4">
             <!-- Popular Workshops -->
             <div class="card">
               <div class="filter">
