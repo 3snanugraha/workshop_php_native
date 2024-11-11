@@ -63,44 +63,35 @@ checkAuth();
               <h5 class="card-title">Datatables</h5>
               <p class="brand-color">Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p>
 
-              <!-- Table with stripped rows -->
-              <table class="table datatable">
+              <!-- Fetch data peserta dari db -->
+              <table class="table datatable" id="participantTable">
                 <thead>
                   <tr>
-                    <th>
-                      <b>N</b>ame
-                    </th>
-                    <th>Ext.</th>
-                    <th>City</th>
-                    <th data-type="date" data-format="YYYY/DD/MM">Start Date</th>
-                    <th>Completion</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Unity Pugh</td>
-                    <td>9958</td>
-                    <td>Curicó</td>
-                    <td>2005/02/11</td>
-                    <td>37%</td>
-                  </tr>
-                  <tr>
-                    <td>Alisa Horn</td>
-                    <td>9853</td>
-                    <td>Ucluelet</td>
-                    <td>2007/01/11</td>
-                    <td>39%</td>
-                  </tr>
-                  <tr>
-                    <td>Zelenia Roman</td>
-                    <td>7516</td>
-                    <td>Redwater</td>
-                    <td>2012/03/03</td>
-                    <td>31%</td>
-                  </tr>
+                  <?php
+                  $users = getUsers(); // Using the existing getUsers() function
+                  foreach($users as $user) {
+                    echo "<tr>";
+                    echo "<td>" . $user['first_name'] . "</td>";
+                    echo "<td>" . $user['last_name'] . "</td>";
+                    echo "<td>" . $user['username'] . "</td>";
+                    echo "<td>" . $user['email'] . "</td>";
+                    echo "<td>" . $user['phone'] . "</td>";
+                    echo "<td>" . $user['role'] . "</td>";
+                    echo "</tr>";
+                  }
+                  ?>
                 </tbody>
               </table>
-              <!-- End Table with stripped rows -->
+
 
             </div>
           </div>
@@ -134,6 +125,16 @@ checkAuth();
   <script src="assets/js/main.js"></script>
   <script src="assets/js/autohide.js"></script>
 
+  <!-- Add this JavaScript code before closing body tag -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      new simpleDatatables.DataTable("#participantTable", {
+          searchable: true,
+          fixedHeight: true,
+          perPage: 10
+      });
+  });
+  </script>
 </body>
 
 </html>

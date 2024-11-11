@@ -46,7 +46,7 @@ function createUser($first_name, $last_name, $username, $password, $email, $role
 
 // Fungsi Read - Mendapatkan semua pengguna
 function getUsers() {
-    global $conn;
+    require '../databases/database.php';
     $sql = "SELECT * FROM users";
     $result = $conn->query($sql);
 
