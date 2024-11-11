@@ -11,14 +11,14 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="mentor.php">
+          <a class="nav-link collapsed" href="data-mentor.php">
             <i class="bi bi-person-video3"></i>
             <span>Mentor</span>
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="peserta.php">
+          <a class="nav-link collapsed" href="data-peserta.php">
             <i class="bi bi-people"></i>
             <span>Peserta</span>
           </a>
