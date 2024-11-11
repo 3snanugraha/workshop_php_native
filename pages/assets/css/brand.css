@@ -1,0 +1,22 @@
+/* BRAND */
+.brand-color{
+    color: #02396f!important;
+  }
+  .brand-color-secondary{
+    color: #a9bbcc!important;
+  }
+  .brand-bg-color{
+    background-color: #02396f!important;
+  }
+  .brand-bg-color-secondary{
+    background-color: #a9bbcc!important;
+  }
+
+  h1,h2,h3,h4,h5,p{
+    color: white;
+  }
+
+  #header {
+    transition: transform 0.3s ease-in-out!important;
+  }
+  
