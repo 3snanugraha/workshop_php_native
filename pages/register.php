@@ -107,6 +107,14 @@ checkAuthorized();
         <div class="col-md-6">
           <h2 class="brand-color">Daftar Sekarang</h2>
           <form method="POST" action="../controllers/controller.php">
+            <?php if(isset($_SESSION['error_message'])): ?>
+            <div class="alert alert-danger">
+              <?php 
+                echo $_SESSION['error_message'];
+                unset($_SESSION['error_message']);
+              ?>
+            </div>
+            <?php endif; ?>
             <!-- Name Fields Section -->
             <div class="row">
               <div class="col-md-6">
@@ -116,7 +124,7 @@ checkAuthorized();
                 <input
                   class="form-control"
                   id="firstname"
-                  name="username"
+                  name="first_name"
                   type="text"
                   required
                 />
@@ -128,7 +136,7 @@ checkAuthorized();
                 <input
                   class="form-control"
                   id="lastname"
-                  name="lastname"
+                  name="last_name"
                   type="text"
                   required
                 />
@@ -185,7 +193,7 @@ checkAuthorized();
                     id="peserta"
                     name="role"
                     type="radio"
-                    value="peserta"
+                    value="user"
                     required
                   />
                   <label class="form-check-label brand-color" for="peserta">
@@ -239,11 +247,12 @@ checkAuthorized();
               <div class="col-md-6">
                 <p class="brand-color mb-0">
                   Already have an account?
-                  <a href="#" class="brand-color"> Log in </a>
+                  <a href="index.php" class="brand-color"> Log in </a>
                 </p>
               </div>
             </div>
-          </form>        </div>
+          </form>
+        </div>
         <!-- bagian Image -->
         <div class="col-md-6">
           <div class="d-flex align-items-center justify-content-center h-100">
@@ -257,8 +266,8 @@ checkAuthorized();
   <script>
     function formatPhoneNumber(input) {
       let value = input.value;
-      if(value.startsWith('0')) {
-        input.value = '62' + value.substring(1);
+      if (value.startsWith("0")) {
+        input.value = "62" + value.substring(1);
       }
     }
   </script>

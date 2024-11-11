@@ -1,5 +1,5 @@
 <?php
-// dev_mode
+// dev_mode = 1
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -16,22 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $password = mysqli_real_escape_string($conn, $_POST['password']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
     login($username_email, $password, $role);
-}
-
-function createUser($first_name, $last_name, $username, $password, $email, $role) {
-    require $db_path;
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-    // Updated SQL query to include first_name and last_name
-    $sql = "INSERT INTO users (first_name, last_name, username, password, email, role) VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssss", $first_name, $last_name, $username, $hashedPassword, $email, $role);
-
-    if ($stmt->execute()) {
-        return "Pengguna berhasil ditambahkan.";
-    } else {
-        return "Gagal menambahkan pengguna: " . $stmt->error;
-    }
 }
 
 // Menangani request untuk menampilkan semua pengguna (Read)
@@ -57,10 +41,78 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['getUser'])) {
     exit;
 }
 
-// Menangani request untuk memperbarui data pengguna (Update)
+// Create User Request
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createUser'])) {
+    require $db_path;
+
+    $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
+    $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
+    $username = strtolower($first_name . $last_name); // Convert to lowercase
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+
+    $createResult = createUser($first_name, $last_name, $username, $password, $email, $role, $phone);
+
+    if ($createResult === "success") {
+        $_SESSION['success_message'] = "Pendaftaran berhasil! Silahkan login.";
+        echo "<script>window.alert('Pendaftaran berhasil. Silahkan login.');</script>";
+        header('Location: ' . $fe_path . 'index.php');
+        exit();
+    } else {
+        $_SESSION['error_message'] = $createResult;
+        header('Location: ' . $fe_path . 'register.php');
+        exit();
+    }
+}
+
+// Update login handling in controller.php
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
+    require $db_path;
+    $username_email = mysqli_real_escape_string($conn, $_POST['username_email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    
+    $login_result = login($username_email, $password, $role);
+    
+    if ($login_result['status'] === 'success') {
+        $_SESSION['login_success'] = $login_result['message'];
+        header("Location: ../pages/dashboard.php");
+    } else {
+        $_SESSION['login_error'] = $login_result['message'];
+        header("Location: ../pages/index.php");
+    }
+    exit();
+}
+
+// Update auth check in other endpoints
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['getUsers'])) {
+    if (!checkAuth()) {
+        $_SESSION['error_message'] = 'Please login first';
+        header('Location: ../pages/index.php');
+        exit();
+    }
+    require $db_path;
+
+    $users = getUsers();
+    $_SESSION['users'] = $users;
+    header('Location: user_list.php');  // Redirect untuk menampilkan daftar pengguna
+    exit;
+}
+
+// Update admin check in relevant endpoints
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateUser'])) {
-    checkAuth();  // Pastikan pengguna sudah login
-    checkAdmin();  // Pastikan pengguna adalah admin
+    if (!checkAuth()) {
+        $_SESSION['error_message'] = 'Please login first';
+        header('Location: ../pages/index.php');
+        exit();
+    }
+    if (!checkAdmin()) {
+        $_SESSION['error_message'] = 'Admin access required';
+        header('Location: ../pages/dashboard.php');
+        exit();
+    }
     require $db_path;
 
     $user_id = mysqli_real_escape_string($conn, $_POST['user_id']);
@@ -86,7 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateUser'])) {
         header('Location: edit_user.php');
     }
 }
-
 // Menangani request untuk menghapus pengguna (Delete)
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteUser'])) {
     checkAuth();  // Pastikan pengguna sudah login
@@ -113,6 +164,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['logout'])) {
     header('Location: ../index.html');
     exit;
 }
-
-
-?>

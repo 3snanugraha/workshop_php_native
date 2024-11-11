@@ -100,6 +100,7 @@ checkAuthorized();
                     <option value="">-- Pilih --</option>
                     <option value="mitra">Mitra</option>
                     <option value="user">Peserta</option>
+                    <option value="admin">Admin</option>
                   </select>
                 </div>
 

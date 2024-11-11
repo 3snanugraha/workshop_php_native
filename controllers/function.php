@@ -6,20 +6,41 @@ error_reporting(E_ALL);
 
 
 // Fungsi Create - Menambahkan pengguna baru
-function createUser($username, $password, $email, $role) {
-    // Hash password untuk keamanan
+function createUser($first_name, $last_name, $username, $password, $email, $role, $phone) {
     global $conn;
+    
+    // Check if email already exists
+    $check_email = "SELECT * FROM users WHERE email = '$email'";
+    $result = $conn->query($check_email);
+    if($result && $result->num_rows > 0) {
+        return "Email sudah terdaftar.";
+    }
+    
+    // Check if username already exists and generate new username if needed
+    $original_username = $username;
+    $counter = 1;
+    
+    do {
+        $check_username = "SELECT * FROM users WHERE username = '$username'";
+        $result = $conn->query($check_username);
+        if($result && $result->num_rows > 0) {
+            $username = $original_username . $counter;
+            $counter++;
+        } else {
+            break;
+        }
+    } while(true);
+
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-    // Query SQL untuk insert data
-    $sql = "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $username, $hashedPassword, $email, $role);
-
-    if ($stmt->execute()) {
-        return "Pengguna berhasil ditambahkan.";
+    
+    // Direct query without prepare
+    $sql = "INSERT INTO users (first_name, last_name, username, password, email, role, phone) 
+            VALUES ('$first_name', '$last_name', '$username', '$hashedPassword', '$email', '$role', '$phone')";
+            
+    if ($conn->query($sql)) {
+        return "success";
     } else {
-        return "Gagal menambahkan pengguna: " . $stmt->error;
+        return "Gagal menambahkan pengguna: " . $conn->error;
     }
 }
 
@@ -80,44 +101,27 @@ function deleteUser($user_id) {
 // Fungsi untuk login
 function login($username_email, $password, $role) {
     global $conn;
-    // Menghindari SQL Injection
     $username_email = mysqli_real_escape_string($conn, $username_email);
     $password = mysqli_real_escape_string($conn, $password);
     $role = mysqli_real_escape_string($conn, $role);
 
-    // Query untuk mencari pengguna berdasarkan username atau email dan role
     $query = "SELECT * FROM users WHERE (email = '$username_email' OR username = '$username_email') AND role = '$role'";
     $result = mysqli_query($conn, $query);
 
     if (mysqli_num_rows($result) > 0) {
-        // Pengguna ditemukan, ambil data pengguna
         $user = mysqli_fetch_assoc($result);
-
-        // Verifikasi password
         if (password_verify($password, $user['password'])) {
-            // Simpan informasi login di session
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = $user['role']; // Simpan role pengguna di session
-
-            // Login berhasil
-            $_SESSION['login_success'] = "Login successful.";
-            header("Location: ../pages/dashboard.php"); 
-            // Redirect ke halaman utama setelah login
-            exit();
-        } else {
-            // Password salah
-            $_SESSION['login_error'] = "Incorrect password.";
-            header("Location: ../pages/index.php");
-            exit();
+            $_SESSION['role'] = $user['role'];
+            return ['status' => 'success', 'message' => 'Login successful'];
         }
-    } else {
-        // Pengguna tidak ditemukan dengan username/email dan role yang diberikan
-        $_SESSION['login_error'] = "No user found with this username/email and role.";
-        header("Location: ../pages/index.php");
-        exit();
+        return ['status' => 'error', 'message' => 'Incorrect password'];
     }
+    return ['status' => 'error', 'message' => 'No user found with this username/email and role'];
 }
+
+
 
 // Validasi sesi: Pastikan pengguna sudah login
 function checkAuth() {
