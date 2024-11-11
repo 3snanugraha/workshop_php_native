@@ -98,6 +98,13 @@ checkAuthorized();
     </style>
   </head>
   <body>
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    </div>
     <!-- Registration Form Container -->
     <div class="container rounded-4">
       <!-- Row start -->
@@ -263,6 +270,35 @@ checkAuthorized();
       <!-- Row End -->
     </div>
   </body>
+
+  <script>
+    const loadingOverlay = document.getElementById('loading-overlay');
+
+    function showLoading() {
+      loadingOverlay.style.display = 'block';
+    }
+
+    function hideLoading() {
+      loadingOverlay.style.display = 'none';
+    }
+
+    // Tambahkan event listener untuk form submission
+    document.querySelector('form').addEventListener('submit', function() {
+      showLoading();
+    });
+
+    // Tambahkan event listener untuk navigasi halaman
+    window.addEventListener('beforeunload', function() {
+      showLoading();
+    });
+
+    // Sembunyikan loading saat halaman selesai dimuat
+    window.addEventListener('load', function() {
+      hideLoading();
+    });
+  </script>
+
+
   <script>
     function formatPhoneNumber(input) {
       let value = input.value;

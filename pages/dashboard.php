@@ -1,6 +1,7 @@
 <?php
 require '../controllers/function.php';
 checkAuth();
+$monthlyParticipants = getMonthlyParticipants();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,12 +69,11 @@ checkAuth();
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
+                      <h6>Menu</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Hari Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Bulan Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Tahun Ini</a></li>
+                    <li><a class="dropdown-item" href="#">Buka</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="location.reload();">Refresh</a></li>
                   </ul>
                 </div>
 
@@ -85,7 +85,7 @@ checkAuth();
                       <i class="bi bi-calendar-event"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>25</h6>
+                      <h6><?= $total_workshop=countWorkshops();?></h6>
                       <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">meningkat</span>
 
                     </div>
@@ -103,12 +103,11 @@ checkAuth();
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
+                      <h6>Menu</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Hari Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Bulan Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Tahun Ini</a></li>
+                    <li><a class="dropdown-item" href="#">Buka</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="location.reload();">Refresh</a></li>
                   </ul>
                 </div>
 
@@ -120,7 +119,7 @@ checkAuth();
                       <i class="bi bi-people"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>528</h6>
+                      <h6><?= $total_user=countRowsUsersByRole('user'); ?></h6>
                       <span class="text-success small pt-1 fw-bold">15%</span> <span class="text-muted small pt-2 ps-1">meningkat</span>
 
                     </div>
@@ -139,12 +138,11 @@ checkAuth();
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
+                      <h6>Menu</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Hari Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Bulan Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Tahun Ini</a></li>
+                    <li><a class="dropdown-item" href="#">Buka</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="location.reload();">Refresh</a></li>
                   </ul>
                 </div>
 
@@ -156,7 +154,7 @@ checkAuth();
                       <i class="bi bi-person-badge"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>48</h6>
+                      <h6><?= $total_user=countRowsUsersByRole('mitra'); ?></h6>
                       <span class="text-success small pt-1 fw-bold">10%</span> <span class="text-muted small pt-2 ps-1">meningkat</span>
 
                     </div>
@@ -175,12 +173,10 @@ checkAuth();
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
+                      <h6>Menu</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Hari Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Bulan Ini</a></li>
-                    <li><a class="dropdown-item" href="#">Tahun Ini</a></li>
+                    <li><a class="dropdown-item" href="#">Refresh</a></li>
                   </ul>
                 </div>
 
@@ -188,47 +184,7 @@ checkAuth();
                   <h5 class="card-title brand-color">Pendaftaran Peserta <span>/Bulanan</span></h5>
 
                   <!-- Bar Chart -->
-                  <canvas id="barChart" style="max-height: 400px;"></canvas>
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new Chart(document.querySelector('#barChart'), {
-                        type: 'bar',
-                        data: {
-                          labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli'],
-                          datasets: [{
-                            label: 'Peserta Terdaftar',
-                            data: [45, 78, 92, 85, 125, 148, 168],
-                            backgroundColor: [
-                              'rgba(255, 99, 132, 0.2)',
-                              'rgba(255, 159, 64, 0.2)',
-                              'rgba(255, 205, 86, 0.2)',
-                              'rgba(75, 192, 192, 0.2)',
-                              'rgba(54, 162, 235, 0.2)',
-                              'rgba(153, 102, 255, 0.2)',
-                              'rgba(201, 203, 207, 0.2)'
-                            ],
-                            borderColor: [
-                              'rgb(255, 99, 132)',
-                              'rgb(255, 159, 64)',
-                              'rgb(255, 205, 86)',
-                              'rgb(75, 192, 192)',
-                              'rgb(54, 162, 235)',
-                              'rgb(153, 102, 255)',
-                              'rgb(201, 203, 207)'
-                            ],
-                            borderWidth: 1
-                          }]
-                        },
-                        options: {
-                          scales: {
-                            y: {
-                              beginAtZero: true
-                            }
-                          }
-                        }
-                      });
-                    });
-                  </script>
+                  <canvas id="barChart_peserta" style="max-height: 400px;"></canvas>
                   <!-- End Bar CHart -->
 
                 </div>
@@ -244,7 +200,7 @@ checkAuth();
                 <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
+                    <h6>Menu</h6>
                   </li>
 
                   <li><a class="dropdown-item" href="#">Hari Ini</a></li>
@@ -257,55 +213,17 @@ checkAuth();
                 <h5 class="card-title brand-color">Workshop Populer <span>| Bulan Ini</span></h5>
 
                 <div class="activity">
-
+                  <?php $workshops = getPopularWorkshop(); 
+                  foreach ($workshops as $workshop) { 
+                    ?>
                   <div class="activity-item d-flex">
-                    <div class="activite-label">120 peserta</div>
+                    <div class="activite-label"><?= $workshop['totalpendaftar'];?></div>
                     <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
                     <div class="activity-content">
-                      Masterclass Pemasaran Digital
+                      <?= $workshop['title'];?>
                     </div>
                   </div>
-
-                  <div class="activity-item d-flex">
-                    <div class="activite-label">98 peserta</div>
-                    <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                    <div class="activity-content">
-                      Bootcamp Pengembangan Web
-                    </div>
-                  </div>
-
-                  <div class="activity-item d-flex">
-                    <div class="activite-label">85 peserta</div>
-                    <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                    <div class="activity-content">
-                      Workshop Desain UI/UX
-                    </div>
-                  </div>
-
-                  <div class="activity-item d-flex">
-                    <div class="activite-label">76 peserta</div>
-                    <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                    <div class="activity-content">
-                      Dasar-dasar Data Science
-                    </div>
-                  </div>
-
-                  <div class="activity-item d-flex">
-                    <div class="activite-label">65 peserta</div>
-                    <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                    <div class="activity-content">
-                      Pengembangan Aplikasi Mobile
-                    </div>
-                  </div>
-
-                  <div class="activity-item d-flex">
-                    <div class="activite-label">52 peserta</div>
-                    <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                    <div class="activity-content">
-                      Workshop Analisis Bisnis
-                    </div>
-                  </div>
-
+                  <?php } ?>
                 </div>
 
               </div>
@@ -318,7 +236,8 @@ checkAuth();
 
 
       </div>
-    </section>  </main><!-- End #main -->
+    </section>  
+  </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer brand-bg-color">
@@ -341,7 +260,60 @@ checkAuth();
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
   <script src="assets/js/autohide.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Data peserta per bulan dari PHP
+      const monthlyParticipants = <?= json_encode($monthlyParticipants); ?>;
 
+      // Konfigurasi dan inisialisasi chart
+      new Chart(document.querySelector('#barChart_peserta'), {
+        type: 'bar',
+        data: {
+          labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+          datasets: [{
+            label: 'Peserta Terdaftar',
+            data: monthlyParticipants,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(255, 159, 64, 0.2)',
+              'rgba(255, 205, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(201, 203, 207, 0.2)',
+              'rgba(100, 100, 100, 0.2)',
+              'rgba(170, 128, 128, 0.2)',
+              'rgba(200, 130, 150, 0.2)',
+              'rgba(130, 180, 160, 0.2)',
+              'rgba(150, 130, 200, 0.2)',
+            ],
+            borderColor: [
+              'rgb(255, 99, 132)',
+              'rgb(255, 159, 64)',
+              'rgb(255, 205, 86)',
+              'rgb(75, 192, 192)',
+              'rgb(54, 162, 235)',
+              'rgb(153, 102, 255)',
+              'rgb(201, 203, 207)',
+              'rgb(100, 100, 100)',
+              'rgb(170, 128, 128)',
+              'rgb(200, 130, 150)',
+              'rgb(130, 180, 160)',
+              'rgb(150, 130, 200)',
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

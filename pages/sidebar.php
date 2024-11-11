@@ -3,7 +3,7 @@
 
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php if($_SESSION['role'] == 'admin'): ?>
-        <li class="nav-item">
+        <li class="nav-item mt-5">
           <a class="nav-link" href="dashboard.php">
             <i class="bi bi-grid"></i>
             <span>Dashboard</span>
@@ -11,7 +11,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="data-mentor.php">
+          <a class="nav-link collapsed" href="data-mitra.php">
             <i class="bi bi-person-video3"></i>
             <span>Mentor</span>
           </a>
@@ -47,12 +47,12 @@
           </ul>
         </li>
 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link collapsed" href="mitra.php">
             <i class="bi bi-building"></i>
             <span>Mitra</span>
           </a>
-        </li>
+        </li> -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="kalender.php">

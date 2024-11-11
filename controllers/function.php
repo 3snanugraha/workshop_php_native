@@ -57,6 +57,19 @@ function getUsers() {
     }
 }
 
+// Fungsi Read - Mendapatkan semua pengguna
+function getUsersByRole($role) {
+    require '../databases/database.php';
+    $sql = "SELECT * FROM users WHERE role='$role'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
 // Fungsi Read - Mendapatkan satu pengguna berdasarkan ID
 function getUserById($user_id) {
     global $conn;
@@ -149,5 +162,82 @@ function checkAdmin() {
         exit;
     }
 }
+
+
+// ======= DASHBOARD DATA ======
+// Rows Counter 
+// Fungsi Count Row - Menghitung jumlah baris dalam tabel tertentu
+function countRowsUsersByRole($role) {
+    require '../databases/database.php';
+    $sql = "SELECT COUNT(*) AS total FROM users WHERE role='$role'";
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    } else {
+        return "Error: " . $conn->error;
+    }
+}
+
+// Fungsi Count Row - Menghitung jumlah baris dalam tabel tertentu
+function countWorkshops() {
+    require '../databases/database.php';
+    $sql = "SELECT COUNT(*) AS total FROM workshops";
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    } else {
+        return "Error: " . $conn->error;
+    }
+}
+
+// Fungsi Read - Mendapatkan workshop populer
+function getPopularWorkshop() {
+    require '../databases/database.php';
+
+    $sql = "
+        SELECT 
+            workshops.*, 
+            COUNT(registrations.user_id) AS totalpendaftar
+        FROM 
+            workshops
+        LEFT JOIN 
+            registrations ON workshops.workshop_id = registrations.workshop_id
+        GROUP BY 
+            workshops.workshop_id
+        ORDER BY 
+            totalpendaftar DESC
+        LIMIT 9
+    ";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+
+
+// Peserta bulanan
+function getMonthlyParticipants() {
+    require '../databases/database.php';
+    $monthlyParticipants = [];
+
+    for ($month = 1; $month <= 12; $month++) {
+        $query = "SELECT COUNT(*) as total FROM users WHERE MONTH(created_at) = $month";
+        $result = $conn->query($query);
+        $data = $result->fetch_assoc();
+        $monthlyParticipants[] = $data['total'];
+    }
+
+    return $monthlyParticipants;
+}
+
 
 ?>

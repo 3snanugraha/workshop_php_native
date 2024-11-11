@@ -72,7 +72,7 @@ checkAuthorized();
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-6">
-          <div class="card rounded-4">
+          <div class="card rounded-4 mt-4 mb-4">
             <div class="card-header brand-color">
               Log in to your account
             </div>
@@ -141,7 +141,7 @@ checkAuthorized();
           </div>
         </div>
         <div class="col-md-6">
-          <div class="card rounded-4">
+          <div class="card rounded-4 mt-4 mb-4">
             <div class="card-header brand-color">
               Create your new account
             </div>
