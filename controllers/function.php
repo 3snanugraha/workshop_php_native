@@ -112,6 +112,7 @@ function login($username_email, $password, $role) {
         $user = mysqli_fetch_assoc($result);
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
             return ['status' => 'success', 'message' => 'Login successful'];
