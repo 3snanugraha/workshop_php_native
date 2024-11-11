@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 session_start();
 require 'function.php';
 $db_path='../databases/database.php';
+$fe_path='../pages/';
 
 // Menangani request untuk login
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
@@ -17,26 +18,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     login($username_email, $password, $role);
 }
 
-// Menangani request untuk menambahkan pengguna baru (Create)
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createUser'])) {
-    checkAuth();  // Pastikan pengguna sudah login
-    checkAdmin();  // Pastikan pengguna adalah admin
+function createUser($first_name, $last_name, $username, $password, $email, $role) {
     require $db_path;
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    // Updated SQL query to include first_name and last_name
+    $sql = "INSERT INTO users (first_name, last_name, username, password, email, role) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssss", $first_name, $last_name, $username, $hashedPassword, $email, $role);
 
-    $createResult = createUser($username, $password, $email, $role);
-
-    // Setelah berhasil, arahkan kembali atau beri pesan sukses
-    if ($createResult === "Pengguna berhasil ditambahkan.") {
-        $_SESSION['success_message'] = $createResult;
-        header('Location: user_list.php');  // Redirect setelah sukses
+    if ($stmt->execute()) {
+        return "Pengguna berhasil ditambahkan.";
     } else {
-        $_SESSION['error_message'] = $createResult;
-        header('Location: create_user.php');  // Redirect jika gagal
+        return "Gagal menambahkan pengguna: " . $stmt->error;
     }
 }
 
