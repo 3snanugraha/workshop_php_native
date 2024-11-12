@@ -2,8 +2,16 @@
   <aside id="sidebar" class="sidebar brand-bg-color-secondary">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php if($_SESSION['role'] == 'admin'): ?>
-        <li class="nav-item mt-5">
+    <li class="nav-item mt-2 d-flex justify-content-center">
+      <a class="nav-link collapsed text-center ml-4">
+        <img src="assets/img/logo-worksmart.png" alt="logo" width="30">
+        <span>Worksmart</span>
+      </a>
+    </li>
+    <hr>
+      
+    <?php if($_SESSION['role'] == 'admin'): ?>
+        <li class="nav-item">
           <a class="nav-link" href="dashboard.php">
             <i class="bi bi-grid"></i>
             <span>Dashboard</span>

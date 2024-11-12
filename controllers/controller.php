@@ -75,6 +75,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createUser'])) {
     }
 }
 
+// Create User Request
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createMitra'])) {
+    require $db_path;
+
+    $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
+    $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
+    $username = strtolower($first_name . $last_name); // Convert to lowercase
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    if($_SESSION['role']!='admin'){
+        $role = mysqli_real_escape_string($conn, $_POST['role']);
+    }else{
+        $role = 'mitra';
+    }
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+
+    $createResult = createUser($first_name, $last_name, $username, $password, $email, $role, $phone);
+
+    if(!isset($_SESSION['user_id'])){
+        if ($createResult === "success") {
+            $_SESSION['success_message'] = "Pendaftaran berhasil! Silahkan login.";
+            echo "<script>window.alert('Pendaftaran berhasil. Silahkan login.');</script>";
+            header('Location: ' . $fe_path . 'index.php');
+            exit();
+        } else {
+            $_SESSION['error_message'] = $createResult;
+            header('Location: ' . $fe_path . 'register.php');
+            exit();
+        }
+    }else{
+        echo "<script>alert('Mitra berhasil ditambahkan');window.location='../pages/data-mitra.php';</script>";
+    }
+}
+
 // Update login handling in controller.php
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     require $db_path;
@@ -138,6 +172,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateUser'])) {
         } else {
             echo "<script>alert('$updateResult');</script>";
             echo "<script>window.location.href='../pages/data-peserta.php';</script>";
+        }
+    }
+}
+
+// Update admin check in relevant endpoints
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateMitra'])) {
+    $auth = checkInputAuth();
+    if (!$auth) {
+        echo "<script>alert('Anda tidak diizinkan untuk operasi ini.');window.location='../pages/index.php';</script>";
+        exit();
+    } else {
+        require $db_path;
+
+        $user_id = mysqli_real_escape_string($conn, $_POST['user_id']);
+        $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
+        $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
+        $username = mysqli_real_escape_string($conn, $_POST['username']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+
+        // Check if a new password is provided; if empty, pass null
+        $password = !empty($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : null;
+
+        // Update the user with the provided data
+        $updateResult = updateUser($user_id, $first_name, $last_name, $username, $password, $email, $phone);
+
+        // Redirect after updating
+        if ($updateResult === "Pengguna berhasil diperbarui.") {
+            echo "<script>alert('Mitra berhasil diperbarui.');</script>";
+            echo "<script>window.location.href='../pages/data-mitra.php';</script>";
+        } else {
+            echo "<script>alert('Mitra gagal diperbarui.');</script>";
+            echo "<script>window.location.href='../pages/data-mitra.php';</script>";
         }
     }
 }
