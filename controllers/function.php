@@ -146,6 +146,16 @@ function checkAuth() {
     }
 }
 
+// Validasi auth untuk input, update, dll
+function checkInputAuth() {
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        $auth=false;
+    }else{
+        $auth=true;
+    }
+    return $auth;
+}
+
 // Validasi ketika di halaman login
 function checkAuthorized(){
     session_start();

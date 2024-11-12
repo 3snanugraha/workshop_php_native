@@ -50,20 +50,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createUser'])) {
     $username = strtolower($first_name . $last_name); // Convert to lowercase
     $password = mysqli_real_escape_string($conn, $_POST['password']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    if($_SESSION['role']!='admin'){
+        $role = mysqli_real_escape_string($conn, $_POST['role']);
+    }else{
+        $role = 'user';
+    }
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
 
     $createResult = createUser($first_name, $last_name, $username, $password, $email, $role, $phone);
 
-    if ($createResult === "success") {
-        $_SESSION['success_message'] = "Pendaftaran berhasil! Silahkan login.";
-        echo "<script>window.alert('Pendaftaran berhasil. Silahkan login.');</script>";
-        header('Location: ' . $fe_path . 'index.php');
-        exit();
-    } else {
-        $_SESSION['error_message'] = $createResult;
-        header('Location: ' . $fe_path . 'register.php');
-        exit();
+    if(!isset($_SESSION['user_id'])){
+        if ($createResult === "success") {
+            $_SESSION['success_message'] = "Pendaftaran berhasil! Silahkan login.";
+            echo "<script>window.alert('Pendaftaran berhasil. Silahkan login.');</script>";
+            header('Location: ' . $fe_path . 'index.php');
+            exit();
+        } else {
+            $_SESSION['error_message'] = $createResult;
+            header('Location: ' . $fe_path . 'register.php');
+            exit();
+        }
+    }else{
+        echo "<script>alert('Peserta berhasil ditambahkan');window.location='../pages/data-peserta.php';</script>";
     }
 }
 
@@ -138,23 +146,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateUser'])) {
         header('Location: edit_user.php');
     }
 }
+
 // Menangani request untuk menghapus pengguna (Delete)
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteUser'])) {
-    checkAuth();  // Pastikan pengguna sudah login
-    checkAdmin();  // Pastikan pengguna adalah admin
-    require $db_path;
+    $auth = checkInputAuth();
+    if (!$auth) {
+        echo "<script>alert('Anda tidak diizinkan untuk operasi ini.');window.location='../pages/index.php';</script>";
+        exit();
+        }else{
+            require $db_path;
 
-    $user_id = mysqli_real_escape_string($conn, $_GET['deleteUser']);
-    $deleteResult = deleteUser($user_id);
-    
-    // Setelah penghapusan, redirect ke daftar pengguna
-    if ($deleteResult === "Pengguna berhasil dihapus.") {
-        echo "<script>alert('$deleteResult');</script>";
-    } else {
-        echo "<script>alert('$deleteResult');</script>";
-    }
-    header('Location: ../pages/data-peserta.php');  // Redirect ke halaman daftar pengguna
-    exit;
+            $user_id = mysqli_real_escape_string($conn, $_GET['deleteUser']);
+            $deleteResult = deleteUser($user_id);
+            
+            // Setelah penghapusan, redirect ke daftar pengguna
+            if ($deleteResult === "Pengguna berhasil dihapus.") {
+                echo "<script>alert('$deleteResult');</script>";
+            } else {
+                echo "<script>alert('$deleteResult');</script>";
+            }
+            echo "<script>window.location.href='../pages/data-peserta.php';</script>";    
+            exit;
+        }
 }
 
 // Logout

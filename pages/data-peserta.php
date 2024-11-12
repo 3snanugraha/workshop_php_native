@@ -67,7 +67,9 @@ checkAuth();
               <h5 class="card-title">Data Peserta</h5>
               <p class="text-dark">Berikut adalah daftar peserta yang terdaftar dalam sistem.</p>
               <a href="#" data-bs-toggle="modal" data-bs-target="#tambahPeserta" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-person-plus me-2"></i>Tambah Peserta</a>
-              <a href="#" onclick="location.reload();" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</a>              <!-- Fetch data peserta dari db -->
+              <a href="#" onclick="location.reload();" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</a>              
+              
+              <!-- Fetch data peserta dari db -->
               <div class="table-responsive">
                 <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
                 <thead>
@@ -155,6 +157,8 @@ checkAuth();
     </section>  
   </main>
   </main><!-- End #main -->
+
+  <?php require "modals.php";?>
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer brand-bg-color">
