@@ -56,7 +56,8 @@ $kategori = $_GET['kategori'];
           <li class="breadcrumb-item active">Export Laporan <?= $kategori; ?></li>
         </ol>
       </nav>
-    </div><!-- End Page Title -->
+    </div>
+    <!-- End Page Title -->
     <section class="section dashboard">
       <div class="row">
         <div class="col-lg-12">
@@ -64,68 +65,36 @@ $kategori = $_GET['kategori'];
             <div class="card-body">
               <h5 class="card-title">
                 <i class="bi bi-file-earmark-text me-2"></i>
-                Export Laporan <?= ucfirst($kategori) ?>
+                Laporan Data <?= ucfirst($kategori) ?>
               </h5>
 
               <form id="reportForm" class="row g-3">
-                <div class="col-md-4">
-                  <label class="form-label">Periode Awal</label>
-                  <input type="date" class="form-control" id="startDate" name="start_date" required>
-                </div>
-                
-                <div class="col-md-4">
-                  <label class="form-label">Periode Akhir</label>
-                  <input type="date" class="form-control" id="endDate" name="end_date" required>
-                </div>
-
-                <div class="col-md-4">
-                  <label class="form-label">Format Export</label>
-                  <select class="form-select" id="exportFormat" name="format" required>
-                    <option value="excel">Excel (.xlsx)</option>
-                    <option value="pdf">PDF</option>
-                    <option value="csv">CSV</option>
-                  </select>
-                </div>
-
-                <?php if($kategori == 'peserta' || $kategori == 'mitra'): ?>
                 <div class="col-md-6">
-                  <label class="form-label">Status Akun</label>
-                  <select class="form-select" name="account_status">
-                    <option value="all">Semua Status</option>
-                    <option value="active">Aktif</option>
-                    <option value="inactive">Non-Aktif</option>
-                  </select>
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Periode Awal</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                      <input type="date" class="form-control" id="startDate" name="start_date" required>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">Urutkan Berdasarkan</label>
-                  <select class="form-select" name="sort_by">
-                    <option value="created_at">Tanggal Registrasi</option>
-                    <option value="name">Nama</option>
-                    <option value="email">Email</option>
-                  </select>
+                  <div class="form-group">
+                    <label class="form-label fw-bold">Periode Akhir</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                      <input type="date" class="form-control" id="endDate" name="end_date" required>
+                    </div>
+                  </div>
                 </div>
-                <?php endif; ?>
 
-                <div class="col-12">
+                <div class="col-12 mt-4">
                   <button type="submit" class="btn btn-primary brand-bg-color rounded-pill">
-                    <i class="bi bi-download me-2"></i>Export Laporan
-                  </button>
-                  <button type="button" onclick="previewReport()" class="btn btn-secondary rounded-pill">
-                    <i class="bi bi-eye me-2"></i>Preview
+                    <i class="bi bi-printer me-2"></i>Export Laporan
                   </button>
                 </div>
               </form>
-
-              <!-- Preview Area -->
-              <div id="previewArea" class="mt-4" style="display:none">
-                <h6 class="text-muted mb-3">Preview Laporan</h6>
-                <div class="table-responsive">
-                  <table class="table table-striped table-hover" id="previewTable">
-                    <!-- Dynamic content will be loaded here -->
-                  </table>
-                </div>
-              </div>
 
             </div>
           </div>
@@ -133,61 +102,7 @@ $kategori = $_GET['kategori'];
       </div>
     </section>
 
-    <!-- Add this JavaScript before closing body -->
-    <script>
-    $(document).ready(function() {
-        // Set default dates
-        let today = new Date();
-        let lastMonth = new Date();
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
-        
-        $('#startDate').val(lastMonth.toISOString().split('T')[0]);
-        $('#endDate').val(today.toISOString().split('T')[0]);
 
-        $('#reportForm').on('submit', function(e) {
-            e.preventDefault();
-            exportReport();
-        });
-    });
-
-    function exportReport() {
-        let formData = new FormData(document.getElementById('reportForm'));
-        formData.append('kategori', '<?= $kategori ?>');
-
-        $.ajax({
-            url: '../controllers/export_controller.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                let blob = new Blob([response]);
-                let link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = 'Laporan_<?= $kategori ?>_' + new Date().toISOString().split('T')[0] + '.' + $('#exportFormat').val();
-                link.click();
-            }
-        });
-    }
-
-    function previewReport() {
-        let formData = new FormData(document.getElementById('reportForm'));
-        formData.append('kategori', '<?= $kategori ?>');
-        formData.append('preview', 'true');
-
-        $.ajax({
-            url: '../controllers/export_controller.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                $('#previewArea').show();
-                $('#previewTable').html(response);
-            }
-        });
-    }
-    </script>
   </main>
   </main><!-- End #main -->
 
@@ -226,7 +141,50 @@ $kategori = $_GET['kategori'];
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
   <script src="assets/js/autohide.js"></script>
+  <script>
+      $(document).ready(function() {
+          let today = new Date();
+          let firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+          
+          $('#startDate').val(firstDay.toISOString().split('T')[0]);
+          $('#endDate').val(today.toISOString().split('T')[0]);
 
+          $('#reportForm').on('submit', function(e) {
+              e.preventDefault();
+              generateReport();
+          });
+      });
+
+      function generateReport() {
+          let form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'print_laporan.php';
+          form.target = '_blank';
+
+          let startDateInput = document.createElement('input');
+          startDateInput.type = 'hidden';
+          startDateInput.name = 'start_date';
+          startDateInput.value = $('#startDate').val();
+
+          let endDateInput = document.createElement('input');
+          endDateInput.type = 'hidden';
+          endDateInput.name = 'end_date';
+          endDateInput.value = $('#endDate').val();
+
+          let kategoriInput = document.createElement('input');
+          kategoriInput.type = 'hidden';
+          kategoriInput.name = 'kategori';
+          kategoriInput.value = '<?= $kategori ?>';
+
+          form.appendChild(startDateInput);
+          form.appendChild(endDateInput);
+          form.appendChild(kategoriInput);
+
+          document.body.appendChild(form);
+          form.submit();
+          document.body.removeChild(form);
+      }
+    </script>
 </body>
 
 </html>

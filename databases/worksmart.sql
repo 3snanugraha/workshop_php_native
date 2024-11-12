@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 11, 2024 at 10:05 PM
+-- Generation Time: Nov 12, 2024 at 09:07 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -36,6 +36,14 @@ CREATE TABLE `feedback` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`feedback_id`, `user_id`, `workshop_id`, `rating`, `comment`, `created_at`) VALUES
+(1, 1, 1, 5, 'Workshop yang sangat bermanfaat dan menarik.', '2024-12-01 09:00:00'),
+(2, 7, 2, 4, 'Materi workshop cukup bagus, tetapi bisa lebih interaktif.', '2024-12-05 10:00:00');
+
 -- --------------------------------------------------------
 
 --
@@ -65,6 +73,14 @@ CREATE TABLE `payments` (
   `payment_status` enum('successful','failed') NOT NULL DEFAULT 'failed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`payment_id`, `registration_id`, `amount`, `payment_date`, `payment_method`, `payment_status`) VALUES
+(1, 1, 100000.00, '2024-11-11 15:12:00', 'bank_transfer', 'failed'),
+(2, 2, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'failed');
+
 -- --------------------------------------------------------
 
 --
@@ -81,6 +97,14 @@ CREATE TABLE `registrations` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `registrations`
+--
+
+INSERT INTO `registrations` (`registration_id`, `user_id`, `workshop_id`, `registration_date`, `status`, `payment_status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '2024-11-11 15:10:00', 'registered', 'paid', '2024-11-11 08:10:00', '2024-11-11 08:10:00'),
+(2, 7, 2, '2024-11-11 15:30:00', 'registered', 'pending', '2024-11-11 08:30:00', '2024-11-11 21:45:32');
 
 -- --------------------------------------------------------
 
@@ -106,9 +130,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name`, `email`, `phone`, `role`, `created_at`, `updated_at`) VALUES
-(1, 'peserta_coba', '$2y$10$eubCoaVJ/JGKQOfnHp6HTeoWQXVlM1PXyizk2OVlBY12qEWOqGIN6', 'Ujang', 'Jebred', 'peserta_coba@gmail.com', '62895339046899', 'user', '2024-11-10 21:34:00', '2024-11-11 13:41:57'),
+(1, 'peserta_coba', '$2y$10$eubCoaVJ/JGKQOfnHp6HTeoWQXVlM1PXyizk2OVlBY12qEWOqGIN6', 'Budi', 'Setiadi', 'peserta_coba@gmail.com', '62895339046899', 'user', '2024-11-10 21:34:00', '2024-11-11 23:29:44'),
 (6, 'admin', '$2y$10$u/1/HGSto.CpUobrij9PWuQma3n7UjAlfjRQTXIBsTOzXFPkXX9R2', 'Admin', 'admin', 'admin@gmail.com', '62895339046899', 'admin', '2024-11-11 14:10:50', '2024-11-11 14:11:20'),
-(7, 'cobacoba', '$2y$10$Q0vBLeJeWo3WuB8OYKXJFuKaTqrW/xnZpHs.fxTw4MFm4Svw6eIyO', 'Coba', 'Coba', 'coba@gmail.com', '6282344332222', 'user', '2024-11-11 14:36:09', '2024-11-11 14:36:09');
+(7, 'hartosup', '$2y$10$Q0vBLeJeWo3WuB8OYKXJFuKaTqrW/xnZpHs.fxTw4MFm4Svw6eIyO', 'Harto', 'Supratman', 'coba@gmail.com', '62823443324311', 'user', '2024-11-11 14:36:09', '2024-11-12 18:27:33'),
+(8, 'mitra_sss', '$2y$10$fgWyKsC4I8NkL5LyoeDZaOlvWJ8NLu4UyyaDF3jKUT3PJYDOuYisK', 'Mitra', 'Satu', 'mitrasatu@gmail.com', '6289235335225', 'mitra', '2024-11-11 21:25:10', '2024-11-12 19:04:48'),
+(9, 'mitra_2', '$2y$10$s9fYJqIDJsWu/1C2xeIbneJYUpqZMWuKiNx7p8BoHf9wqfIfRuDru', 'Mitra', 'Dua', 'mitradua@gmail.com', '62895339046899', 'mitra', '2024-11-11 21:26:07', '2024-11-11 21:26:07'),
+(18, 'mitratiga', '$2y$10$JXANhM21J9./i5G7yxXZE.cRTwA.fNHODjAxKaby94Niyj2kleEeK', 'Mitra', 'Tiga', 'mitra3@gmail.com', '62895339046899', 'mitra', '2024-11-12 19:01:17', '2024-11-12 19:01:17');
 
 -- --------------------------------------------------------
 
@@ -130,6 +157,14 @@ CREATE TABLE `workshops` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `workshops`
+--
+
+INSERT INTO `workshops` (`workshop_id`, `mitra_id`, `title`, `description`, `price`, `location`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
+(1, 8, 'Digital Marketing', 'Workshop ini membahas tentang pengembangan pribadi.', 100000.00, 'Jakarta', '2024-12-01 09:00:00', '2024-12-01 15:00:00', 'active', '2024-11-11 09:30:00', '2024-11-11 21:47:51'),
+(2, 9, 'Affiliate', 'Workshop tentang digital marketing dan strategi online.', 200000.00, 'Bandung', '2024-12-05 09:00:00', '2024-12-05 16:00:00', 'active', '2024-11-11 10:00:00', '2024-11-11 21:47:58');
+
 -- --------------------------------------------------------
 
 --
@@ -144,6 +179,14 @@ CREATE TABLE `workshop_schedules` (
   `end_time` time NOT NULL,
   `location` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `workshop_schedules`
+--
+
+INSERT INTO `workshop_schedules` (`schedule_id`, `workshop_id`, `date`, `start_time`, `end_time`, `location`) VALUES
+(1, 1, '2024-12-01', '09:00:00', '15:00:00', 'Jakarta'),
+(2, 2, '2024-12-05', '09:00:00', '16:00:00', 'Bandung');
 
 --
 -- Indexes for dumped tables
@@ -201,7 +244,7 @@ ALTER TABLE `workshop_schedules`
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -213,31 +256,31 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `registrations`
 --
 ALTER TABLE `registrations`
-  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `workshops`
 --
 ALTER TABLE `workshops`
-  MODIFY `workshop_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `workshop_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `workshop_schedules`
 --
 ALTER TABLE `workshop_schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
