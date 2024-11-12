@@ -111,41 +111,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['getUsers'])) {
 
 // Update admin check in relevant endpoints
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateUser'])) {
-    if (!checkAuth()) {
-        $_SESSION['error_message'] = 'Please login first';
-        header('Location: ../pages/index.php');
+    $auth = checkInputAuth();
+    if (!$auth) {
+        echo "<script>alert('Anda tidak diizinkan untuk operasi ini.');window.location='../pages/index.php';</script>";
         exit();
-    }
-    if (!checkAdmin()) {
-        $_SESSION['error_message'] = 'Admin access required';
-        header('Location: ../pages/dashboard.php');
-        exit();
-    }
-    require $db_path;
-
-    $user_id = mysqli_real_escape_string($conn, $_POST['user_id']);
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
-    
-    // Jika password tidak diubah, bisa dilewati
-    $password = isset($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : '';
-
-    if ($password) {
-        $updateResult = updateUser($user_id, $username, $password, $email, $role);
     } else {
-        $updateResult = updateUser($user_id, $username, null, $email, $role);
-    }
+        require $db_path;
 
-    // Setelah berhasil atau gagal, arahkan kembali ke halaman yang sesuai
-    if ($updateResult === "Pengguna berhasil diperbarui.") {
-        $_SESSION['success_message'] = $updateResult;
-        header('Location: user_list.php');
-    } else {
-        $_SESSION['error_message'] = $updateResult;
-        header('Location: edit_user.php');
+        $user_id = mysqli_real_escape_string($conn, $_POST['user_id']);
+        $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
+        $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
+        $username = mysqli_real_escape_string($conn, $_POST['username']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+
+        // Check if a new password is provided; if empty, pass null
+        $password = !empty($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : null;
+
+        // Update the user with the provided data
+        $updateResult = updateUser($user_id, $first_name, $last_name, $username, $password, $email, $phone);
+
+        // Redirect after updating
+        if ($updateResult === "Pengguna berhasil diperbarui.") {
+            echo "<script>alert('$updateResult');</script>";
+            echo "<script>window.location.href='../pages/data-peserta.php';</script>";
+        } else {
+            echo "<script>alert('$updateResult');</script>";
+            echo "<script>window.location.href='../pages/data-peserta.php';</script>";
+        }
     }
 }
+
+
 
 // Menangani request untuk menghapus pengguna (Delete)
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteUser'])) {

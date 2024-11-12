@@ -83,19 +83,42 @@ function getUserById($user_id) {
 }
 
 // Fungsi Update - Memperbarui data pengguna berdasarkan ID
-function updateUser($user_id, $username, $password, $email, $role) {
+function updateUser($user_id, $first_name, $last_name, $username, $password, $email, $phone) {
     global $conn;
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $sql = "UPDATE users SET username = ?, password = ?, email = ?, role = ? WHERE user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssi", $username, $hashedPassword, $email, $role, $user_id);
 
+    // Check if a new password is provided, and hash it if so
+    $hashedPassword = $password ? password_hash($password, PASSWORD_BCRYPT) : null;
+
+    // Start building the SQL query
+    $sql = "UPDATE users SET first_name = ?, last_name = ?, username = ?, email = ?, phone = ?";
+    $params = [$first_name, $last_name, $username, $email, $phone];
+    $types = "sssss";
+
+    // Add password to SQL query if it is being updated
+    if ($hashedPassword) {
+        $sql .= ", password = ?";
+        $params[] = $hashedPassword;
+        $types .= "s";
+    }
+
+    // Finalize the query with the condition
+    $sql .= " WHERE user_id = ?";
+    $params[] = $user_id;
+    $types .= "i";
+
+    // Prepare and bind parameters dynamically
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+
+    // Execute the query and return the result
     if ($stmt->execute()) {
         return "Pengguna berhasil diperbarui.";
     } else {
         return "Gagal memperbarui pengguna: " . $stmt->error;
     }
 }
+
+
 
 // Fungsi Delete - Menghapus pengguna berdasarkan ID
 function deleteUser($user_id) {

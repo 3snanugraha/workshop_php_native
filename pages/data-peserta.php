@@ -97,9 +97,10 @@ checkAuth();
                       <td class="text-center">
                         <div class="btn-group" role="group">
                           <button type="button" class="btn btn-sm btn-outline-warning me-1 rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal<?= $user['user_id'] ?>" title="Edit"><i class="bi bi-pencil-square"></i></button>
+                          <a href="https://wa.me/<?= $user['phone'] ?>" target="_blank" class="btn btn-sm btn-outline-success me-1 rounded-pill" title="Kirim pesan di WhatsApp"><i class="bi bi-whatsapp"></i></a>
                           <a onclick="return confirm('Apakah anda yakin akan menghapus data dengan nama <?= $user['first_name'];?> ?')" href="../controllers/controller.php?deleteUser=<?= $user['user_id']; ?>" type="button" class="btn btn-sm btn-outline-danger rounded-pill" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></a>
                         </div>
-                      </td>
+                      </td>                    
                     </tr>
                     
                     <!-- Modal for editing user -->
@@ -111,37 +112,56 @@ checkAuth();
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
-                            <form action="update_user.php" method="POST">
+                            <form action="../controllers/controller.php" method="POST">
                               <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
+                              
+                              <!-- First Name Field -->
                               <div class="mb-3">
                                 <label for="firstName" class="form-label">First Name</label>
                                 <input type="text" class="form-control" id="firstName" name="first_name" value="<?= $user['first_name'] ?>" required>
                               </div>
+                              
+                              <!-- Last Name Field -->
                               <div class="mb-3">
                                 <label for="lastName" class="form-label">Last Name</label>
                                 <input type="text" class="form-control" id="lastName" name="last_name" value="<?= $user['last_name'] ?>" required>
                               </div>
+                              
+                              <!-- Username Field -->
                               <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" value="<?= $user['username'] ?>" required>
                               </div>
+                              
+                              <!-- Email Field -->
                               <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" value="<?= $user['email'] ?>" required>
                               </div>
+                              
+                              <!-- Phone Field -->
                               <div class="mb-3">
                                 <label for="phone" class="form-label">Phone</label>
                                 <input type="tel" class="form-control" id="phone" name="phone" value="<?= $user['phone'] ?>" required>
                               </div>
+                              
+                              <!-- Password Field (Optional) -->
+                              <div class="mb-3">
+                                <label for="password" class="form-label">Password (leave blank if no change)</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                              </div>
+                              
+                              <!-- Modal Footer with Submit Button -->
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary brand-bg-color">Save Changes</button>
+                                <button type="submit" name="updateUser" class="btn btn-primary brand-bg-color">Save Changes</button>
                               </div>
                             </form>
                           </div>
                         </div>
                       </div>
                     </div>
+
                   <?php } ?>
                 </tbody>
                 </table>
