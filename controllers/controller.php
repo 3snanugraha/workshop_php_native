@@ -149,11 +149,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteUser'])) {
     
     // Setelah penghapusan, redirect ke daftar pengguna
     if ($deleteResult === "Pengguna berhasil dihapus.") {
-        $_SESSION['success_message'] = $deleteResult;
+        echo "<script>alert('$deleteResult');</script>";
     } else {
-        $_SESSION['error_message'] = $deleteResult;
+        echo "<script>alert('$deleteResult');</script>";
     }
-    header('Location: user_list.php');  // Redirect ke halaman daftar pengguna
+    header('Location: ../pages/data-peserta.php');  // Redirect ke halaman daftar pengguna
     exit;
 }
 

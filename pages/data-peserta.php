@@ -66,7 +66,8 @@ checkAuth();
             <div class="card-body">
               <h5 class="card-title">Data Peserta</h5>
               <p class="text-dark">Berikut adalah daftar peserta yang terdaftar dalam sistem.</p>
-              <!-- Fetch data peserta dari db -->
+              <a href="#" data-bs-toggle="modal" data-bs-target="#tambahPeserta" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-person-plus me-2"></i>Tambah Peserta</a>
+              <a href="#" onclick="location.reload();" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</a>              <!-- Fetch data peserta dari db -->
               <div class="table-responsive">
                 <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
                 <thead>
@@ -94,7 +95,7 @@ checkAuth();
                       <td class="text-center">
                         <div class="btn-group" role="group">
                           <button type="button" class="btn btn-sm btn-outline-warning me-1 rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal<?= $user['user_id'] ?>" title="Edit"><i class="bi bi-pencil-square"></i></button>
-                          <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></button>
+                          <a onclick="return confirm('Apakah anda yakin akan menghapus data dengan nama <?= $user['first_name'];?> ?')" href="../controllers/controller.php?deleteUser=<?= $user['user_id']; ?>" type="button" class="btn btn-sm btn-outline-danger rounded-pill" data-bs-toggle="tooltip" title="Delete"><i class="bi bi-trash"></i></a>
                         </div>
                       </td>
                     </tr>
