@@ -3,6 +3,12 @@
 
     <ul class="sidebar-nav" id="sidebar-nav">
     <li class="nav-item mt-2 d-flex justify-content-center">
+      &nbsp;
+      &nbsp;
+      &nbsp;
+      &nbsp;
+      &nbsp;
+      &nbsp;
       <a class="nav-link collapsed text-center ml-4">
         <img src="assets/img/logo-worksmart.png" alt="logo" width="30">
         <span>Worksmart</span>
@@ -38,17 +44,17 @@
           </a>
           <ul id="laporan-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
             <li>
-              <a href="laporan-keuangan.php">
+              <a href="laporan.php?kategori=Keuangan">
                 <i class="bi bi-circle"></i><span>Keuangan</span>
               </a>
             </li>
             <li>
-              <a href="laporan-mitra.php">
+              <a href="laporan.php?kategori=Mitra">
                 <i class="bi bi-circle"></i><span>Mitra</span>
               </a>
             </li>
             <li>
-              <a href="laporan-peserta.php">
+              <a href="laporan.php?kategori=Peserta">
                 <i class="bi bi-circle"></i><span>Peserta</span>
               </a>
             </li>
