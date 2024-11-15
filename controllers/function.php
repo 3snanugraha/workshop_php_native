@@ -160,43 +160,6 @@ function login($username_email, $password, $role) {
 
 
 
-// Validasi sesi: Pastikan pengguna sudah login
-function checkAuth() {
-    session_start();
-    if (!isset($_SESSION['user_id'])) {
-        echo "<script>alert('Sesi anda telah habis. Silahkan login terlebih dahulu.');window.location='../pages/index.php';</script>";
-        exit;
-    }
-}
-
-// Validasi auth untuk input, update, dll
-function checkInputAuth() {
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-        $auth=false;
-    }else{
-        $auth=true;
-    }
-    return $auth;
-}
-
-// Validasi ketika di halaman login
-function checkAuthorized(){
-    session_start();
-    if (isset($_SESSION['user_id'])) {
-        echo "<script>alert('Anda sudah login. Akan diarahkan ke dashboard.');window.location='dashboard.php';</script>";
-    }
-}
-// Validasi peran admin untuk beberapa aksi (hanya admin yang bisa menambah, mengubah, atau menghapus pengguna)
-function checkAdmin() {
-    session_start();
-    if ($_SESSION['role'] !== 'admin') {
-        $_SESSION['error_message'] = "Akses ditolak. Hanya admin yang dapat melakukan aksi ini.";
-        header('Location: dashboard.php');
-        exit;
-    }
-}
-
-
 // ======= DASHBOARD DATA ======
 // Rows Counter 
 // Fungsi Count Row - Menghitung jumlah baris dalam tabel tertentu
@@ -402,6 +365,49 @@ function checkUserSession() {
     return true;
 }
 
+function checkPeserta(){
+    session_start();
+    if(!isset($_SESSION['role']) || $_SESSION['role'] != 'user') {
+        return false;
+    }
+    return true;
+}
+
+// Validasi sesi: Pastikan pengguna sudah login
+function checkAuth() {
+    session_start();
+    if (!isset($_SESSION['user_id'])) {
+        echo "<script>alert('Sesi anda telah habis. Silahkan login terlebih dahulu.');window.location='../pages/index.php';</script>";
+        exit;
+    }
+}
+
+// Validasi auth untuk input, update, dll
+function checkInputAuth() {
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        $auth=false;
+    }else{
+        $auth=true;
+    }
+    return $auth;
+}
+
+// Validasi ketika di halaman login
+function checkAuthorized(){
+    session_start();
+    if (isset($_SESSION['user_id'])) {
+        echo "<script>alert('Anda sudah login. Akan diarahkan ke dashboard.');window.location='dashboard.php';</script>";
+    }
+}
+// Validasi peran admin untuk beberapa aksi (hanya admin yang bisa menambah, mengubah, atau menghapus pengguna)
+function checkAdmin() {
+    session_start();
+    if ($_SESSION['role'] !== 'admin') {
+        $_SESSION['error_message'] = "Akses ditolak. Hanya admin yang dapat melakukan aksi ini.";
+        header('Location: dashboard.php');
+        exit;
+    }
+}
 
 // ========================================
 //          WORKSHOP CRUD

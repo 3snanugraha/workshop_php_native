@@ -1,6 +1,6 @@
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-
+  
     <div class="d-flex align-items-center justify-content-between">
       <a href="home.php" class="logo d-flex align-items-center">
         <img src="assets/img/logo-worksmart.png" alt="">
@@ -17,10 +17,15 @@
       </form>
     </div> -->
     <!-- End Search Bar -->
+    <div class="ms-3 d-flex justify-content-center">
+        <a href="home.php" class="brand-btn-outline rounded-pill">
+          <i class="bi bi-house-door"></i>
+        </a>
+   </div>     
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-
+        
         <li class="nav-item d-block d-lg-none">
           <a class="nav-link nav-icon search-bar-toggle " href="#">
             <i class="bi bi-search"></i>

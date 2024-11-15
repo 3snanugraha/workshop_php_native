@@ -68,7 +68,7 @@ ini_set('display_errors', 1);
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
       <?php if ($isLogin) { ?>
-        <a class="btn-getstarted" href="index.php">Dashboard</a>        
+        <a class="btn-getstarted" href="dashboard.php">Dashboard</a>        
       <?php } else { ?>
             <a class="btn-getstarted" href="index.php">Daftar</a>
       <?php } ?>
@@ -258,7 +258,7 @@ ini_set('display_errors', 1);
       </div>
 
     </section>
-    <!-- /About Section -->
+    <!-- /About Section -->s
 
     <!-- Workshops Section -->
     <section id="workshops" class="workshops section">
@@ -324,7 +324,9 @@ ini_set('display_errors', 1);
           <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
             <div class="card workshop-card hover-effect">
               <div class="card-badge">
-                <span class="badge bg-gradient"><?= $workshop['status'] ?></span>
+                <span class="badge <?= $workshop['status'] === 'active' ? 'bg-success' : 'bg-danger' ?>">
+                  <?= $workshop['status'] === 'active' ? 'Masih dibuka' : 'Ditutup' ?>
+                </span>
               </div>
               <div class="card-image-wrapper">
                 <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="card-img-top" alt="<?= htmlspecialchars($workshop['title']) ?>">

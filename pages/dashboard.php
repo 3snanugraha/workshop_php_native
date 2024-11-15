@@ -2,6 +2,7 @@
 require '../controllers/function.php';
 checkAuth();
 $monthlyParticipants = getMonthlyParticipants();
+$role = $_SESSION['role'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +56,9 @@ $monthlyParticipants = getMonthlyParticipants();
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
-      <div class="row">
+      <!-- Dashboard untuk Admin -->
+      <?php if($role=='admin'){ ?>
+        <div class="row">
 
         <!-- Left side columns -->
         <div class="col-lg-12">
@@ -235,7 +238,13 @@ $monthlyParticipants = getMonthlyParticipants();
         </div><!-- End Left side columns -->
 
 
-      </div>
+        </div>
+      <?php }else if($role=='user'){ ?>
+      <!-- Dashboard Untuk Peserta atau Mitra -->
+         <div class="row">
+            <h1>Hi im user</h1>
+        </div>
+      <?php } ?>
     </section>  
   </main><!-- End #main -->
 
