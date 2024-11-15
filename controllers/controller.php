@@ -241,3 +241,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['logout'])) {
     header('Location: ../index.html');
     exit;
 }
+

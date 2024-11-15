@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Nov 15, 2024 at 10:38 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Host: localhost
+-- Generation Time: Nov 15, 2024 at 06:25 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,8 +41,8 @@ CREATE TABLE `feedback` (
 --
 
 INSERT INTO `feedback` (`feedback_id`, `user_id`, `workshop_id`, `rating`, `comment`, `created_at`) VALUES
-(1, 1, 1, 5, 'Workshop yang sangat bermanfaat dan menarik.', '2024-12-01 09:00:00'),
-(2, 7, 2, 4, 'Materi workshop cukup bagus, tetapi bisa lebih interaktif.', '2024-12-05 10:00:00');
+(1, 1, 3, 5, 'Workshop yang sangat bermanfaat dan menarik.', '2024-12-01 09:00:00'),
+(2, 19, 3, 5, 'Materi workshop cukup bagus, tetapi bisa lebih interaktif.', '2024-12-05 10:00:00');
 
 -- --------------------------------------------------------
 
@@ -69,7 +69,7 @@ CREATE TABLE `payments` (
   `registration_id` int(11) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `payment_date` datetime DEFAULT current_timestamp(),
-  `payment_method` enum('credit_card','bank_transfer','e-wallet') NOT NULL,
+  `payment_method` enum('bank_transfer','e-wallet') NOT NULL,
   `payment_status` enum('successful','failed') NOT NULL DEFAULT 'failed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -79,7 +79,8 @@ CREATE TABLE `payments` (
 
 INSERT INTO `payments` (`payment_id`, `registration_id`, `amount`, `payment_date`, `payment_method`, `payment_status`) VALUES
 (1, 1, 100000.00, '2024-11-11 15:12:00', 'bank_transfer', 'failed'),
-(2, 2, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'failed');
+(2, 2, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'failed'),
+(3, 3, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'successful');
 
 -- --------------------------------------------------------
 
@@ -103,8 +104,9 @@ CREATE TABLE `registrations` (
 --
 
 INSERT INTO `registrations` (`registration_id`, `user_id`, `workshop_id`, `registration_date`, `status`, `payment_status`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, '2024-11-11 15:10:00', 'registered', 'paid', '2024-11-11 08:10:00', '2024-11-11 08:10:00'),
-(2, 7, 2, '2024-11-11 15:30:00', 'registered', 'pending', '2024-11-11 08:30:00', '2024-11-11 21:45:32');
+(1, 1, 3, '2024-11-11 15:10:00', 'registered', 'paid', '2024-11-11 08:10:00', '2024-11-15 16:56:33'),
+(2, 7, 3, '2024-11-11 15:30:00', 'registered', 'pending', '2024-11-11 08:30:00', '2024-11-15 16:56:36'),
+(3, 19, 3, '2024-11-11 15:30:00', 'registered', 'paid', '2024-11-11 08:30:00', '2024-11-15 16:56:39');
 
 -- --------------------------------------------------------
 
@@ -268,13 +270,13 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `registrations`
 --
 ALTER TABLE `registrations`
-  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`

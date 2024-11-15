@@ -496,5 +496,33 @@ function deleteWorkshop($workshop_id) {
     return "Gagal menghapus workshop: " . $stmt->error;
 }
 
+// ====================================================================
+//  PAYMENT FUNCTION
+// ====================================================================
+function getPaymentData($user_id) {
+    require '../databases/database.php';
 
+    $sql = "SELECT 
+                p.*,
+                r.registration_date,
+                r.status as registration_status,
+                w.title as workshop_title,
+                w.location,
+                w.start_date,
+                w.end_date,
+                CONCAT(m.first_name, ' ', m.last_name) as mitra_name
+            FROM payments p
+            INNER JOIN registrations r ON p.registration_id = r.registration_id
+            INNER JOIN workshops w ON r.workshop_id = w.workshop_id
+            INNER JOIN users m ON w.mitra_id = m.user_id
+            WHERE r.user_id = ?
+            ORDER BY p.payment_date DESC";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
 ?>

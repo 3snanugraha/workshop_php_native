@@ -99,28 +99,28 @@
                 </li>
         
                 <li class="nav-item">
-                  <a class="nav-link collapsed" href="pembayaran.php">
+                  <a class="nav-link collapsed" href="data-pembayaran.php">
                     <i class="bi bi-credit-card"></i>
                     <span>Pembayaran</span>
                   </a>
                 </li>
         
                 <li class="nav-item">
-                  <a class="nav-link collapsed" href="aktivitas.php">
+                  <a class="nav-link collapsed" href="data-pembayaran.php?u=aktivitas">
                     <i class="bi bi-activity"></i>
                     <span>Aktivitas</span>
                   </a>
                 </li>
         
                 <li class="nav-item">
-                  <a class="nav-link collapsed" href="rating.php">
+                  <a class="nav-link collapsed" href="data-feedback.php">
                     <i class="bi bi-star"></i>
                     <span>Rating/Ulasan</span>
                   </a>
                 </li>
         
                 <li class="nav-item">
-                  <a class="nav-link collapsed" href="pesan.php">
+                  <a class="nav-link collapsed" href="data-pesan.php">
                     <i class="bi bi-envelope"></i>
                     <span>Pesan</span>
                   </a>

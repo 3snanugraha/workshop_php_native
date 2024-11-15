@@ -3,6 +3,8 @@ require '../controllers/function.php';
 checkAuth();
 $monthlyParticipants = getMonthlyParticipants();
 $role = $_SESSION['role'];
+$workshops = getAllWorkshops();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +37,28 @@ $role = $_SESSION['role'];
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
   <link href="assets/css/brand.css" rel="stylesheet">
-  
+  <style>
+    .workshop-card {
+    transition: transform 0.3s ease-in-out;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .workshop-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .workshop-details {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .workshop-card .badge {
+        padding: 8px 12px;
+        font-weight: 500;
+    }
+  </style>
 </head>
 
 <body>
@@ -240,10 +263,50 @@ $role = $_SESSION['role'];
 
         </div>
       <?php }else if($role=='user'){ ?>
-      <!-- Dashboard Untuk Peserta atau Mitra -->
-         <div class="row">
-            <h1>Hi im user</h1>
-        </div>
+      <!-- Dashboard Untuk Peserta -->
+      <div class="row mb-3">
+          <div class="col-md-4">
+              <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="searchWorkshop" placeholder="Cari workshop...">
+              </div>
+          </div>
+      </div>
+
+      <div class="row">
+          <?php 
+          foreach($workshops as $workshop) { 
+          ?>
+          <div class="col-lg-4 col-md-6 mb-4">
+              <div class="card h-100 workshop-card">
+                  <img src="assets/img/workshops/<?= $workshop['banner'] ?>" class="card-img-top" alt="Workshop Banner" style="height: 200px; object-fit: cover;">
+                  <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="badge <?= ($workshop['status'] == 'active') ? 'bg-success' : 'bg-danger' ?>"><?= $workshop['status'] ?></span>
+                          <small class="text-muted">By <?= $workshop['mitra_name'] ?></small>
+                      </div>
+                      <h5 class="card-title text-truncate"><?= $workshop['title'] ?></h5>
+                      <p class="card-text text-truncate"><?= $workshop['description'] ?></p>
+                      <div class="workshop-details">
+                          <div class="mb-2">
+                              <i class="bi bi-geo-alt"></i> <?= $workshop['location'] ?>
+                          </div>
+                          <div class="mb-2">
+                              <i class="bi bi-calendar-event"></i> <?= date('d M Y', strtotime($workshop['start_date'])) ?>
+                          </div>
+                          <div class="mb-2">
+                              <i class="bi bi-currency-dollar"></i> Rp <?= number_format($workshop['price'], 0, ',', '.') ?>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="card-footer bg-transparent border-top-0">
+                      <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn brand-btn w-100">Lihat Detail</a>
+                  </div>
+              </div>
+          </div>
+          <?php } ?>
+      </div>
+
       <?php } ?>
     </section>  
   </main><!-- End #main -->
@@ -322,6 +385,27 @@ $role = $_SESSION['role'];
         }
       });
     });
+    document.addEventListener('DOMContentLoaded', function() {
+          const searchInput = document.getElementById('searchWorkshop');
+          const workshopCards = document.querySelectorAll('.workshop-card');
+
+          searchInput.addEventListener('keyup', function(e) {
+              const searchTerm = e.target.value.toLowerCase();
+
+              workshopCards.forEach(card => {
+                  const title = card.querySelector('.card-title').textContent.toLowerCase();
+                  const description = card.querySelector('.card-text').textContent.toLowerCase();
+                  const location = card.querySelector('.bi-geo-alt').parentElement.textContent.toLowerCase();
+
+                  if(title.includes(searchTerm) || description.includes(searchTerm) || location.includes(searchTerm)) {
+                      card.closest('.col-lg-4').style.display = '';
+                  } else {
+                      card.closest('.col-lg-4').style.display = 'none';
+                  }
+              });
+          });
+      });
+
   </script>
 </body>
 
