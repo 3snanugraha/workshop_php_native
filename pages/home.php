@@ -1,6 +1,9 @@
 <?php 
 require_once '../controllers/function.php';
 $workshops = getWorkshopsWithMitra();
+$isLogin = checkUserSession();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 ?>
 <!DOCTYPE html>
@@ -50,6 +53,7 @@ $workshops = getWorkshopsWithMitra();
           <li><a href="#hero" class="active">Beranda</a></li>
           <li><a href="#about">Tentang</a></li>
           <li><a href="#workshops">Workshop</a></li>
+          <?php if($isLogin) { ?>
           <li class="dropdown"><a href="#"><span>Akun</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="#">Profil Saya</a></li>
@@ -59,11 +63,15 @@ $workshops = getWorkshopsWithMitra();
               <li><a href="#">Keluar</a></li>
             </ul>
           </li>
+          <?php } ?>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
-
-      <a class="btn-getstarted" href="index.php">Daftar</a>
+      <?php if ($isLogin) { ?>
+        <a class="btn-getstarted" href="index.php">Dashboard</a>        
+      <?php } else { ?>
+            <a class="btn-getstarted" href="index.php">Daftar</a>
+      <?php } ?>
 
     </div>
   </header>  <main class="main">
@@ -80,6 +88,13 @@ $workshops = getWorkshopsWithMitra();
                 <i class="bi bi-mortarboard-fill me-2"></i>
                 Belajar dan Berkembang dengan Workshop dari Para Ahli
               </div>
+
+              <?php if($isLogin){ ?>
+              <div class="welcome-badge" data-aos="fade-down" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 10px 20px; border-radius: 50px; display: inline-block; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <i class="bi bi-hand-wave-fill me-2"></i>
+                Selamat datang, <?= htmlspecialchars($_SESSION['first_name']) ?>! 👋
+              </div>
+              <?php } ?>
 
               <h1 class="mb-4">
                 Temukan Workshop yang <br>
@@ -249,27 +264,29 @@ $workshops = getWorkshopsWithMitra();
     <section id="workshops" class="workshops section">
 
       <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Workshop Kami</h2>
-        <p>Temukan berbagai workshop pengembangan profesional kami yang komprehensif</p>
+      <div class="container section-title text-center" data-aos="fade-up">
+        <span class="subtitle">Eksplorasi Workshop</span>
+        <h2>Program Unggulan Kami</h2>
+        <p class="lead">Tingkatkan skillset Anda melalui workshop interaktif yang dirancang khusus untuk profesional modern</p>
       </div>
-      <!-- End Section Title -->
 
-      <!-- Search Bar -->
+      <!-- Search Bar with Animation -->
       <div class="container mb-5">
         <div class="row justify-content-center">
-          <div class="col-lg-6">
-            <div class="search-wrapper" data-aos="fade-up">
+          <div class="col-lg-8">
+            <div class="search-wrapper glass-effect" data-aos="zoom-in">
               <div class="input-group">
-                <input type="text" class="form-control" placeholder="Cari workshop..." id="workshopSearch">
-                <select class="form-select" style="max-width: 150px;">
-                  <option selected>Semua Kategori</option>
-                  <option>Kepemimpinan</option>
-                  <option>Pemasaran</option>
-                  <option>Manajemen</option>
+                <input type="text" class="form-control search-input" placeholder="Temukan workshop impianmu..." id="workshopSearch">
+                <select class="form-select custom-select" style="max-width: 180px;">
+                  <option selected>Pilih Kategori</option>
+                  <option>Digital Marketing</option>
+                  <option>Leadership</option>
+                  <option>Data Science</option>
+                  <option>UI/UX Design</option>
+                  <option>Business Strategy</option>
                 </select>
                 <button class="btn btn-primary" type="button">
-                  <i class="bi bi-search"></i> Cari
+                  <i class="bi bi-search"></i> Explore
                 </button>
               </div>
             </div>
@@ -278,77 +295,173 @@ $workshops = getWorkshopsWithMitra();
       </div>
 
       <div class="container">
-        <!-- Filter Options -->
+        <!-- Interactive Filter Options -->
         <div class="row mb-4">
           <div class="col-12">
-            <div class="filter-buttons d-flex gap-2 flex-wrap" data-aos="fade-up">
-              <button class="btn btn-sm btn-outline-primary active">Semua</button>
-              <button class="btn btn-sm btn-outline-primary">Terbaru</button>
-              <button class="btn btn-sm btn-outline-primary">Terpopuler</button>
-              <button class="btn btn-sm btn-outline-primary">Segera Hadir</button>
+            <div class="filter-buttons d-flex gap-3 flex-wrap justify-content-center" data-aos="fade-up">
+              <button class="btn btn-pill active">
+                <i class="bi bi-grid"></i> Semua
+              </button>
+              <button class="btn btn-pill">
+                <i class="bi bi-star"></i> Trending
+              </button>
+              <button class="btn btn-pill">
+                <i class="bi bi-clock"></i> Terbaru
+              </button>
+              <button class="btn btn-pill">
+                <i class="bi bi-calendar-event"></i> Upcoming
+              </button>
+              <button class="btn btn-pill">
+                <i class="bi bi-trophy"></i> Best Seller
+              </button>
             </div>
           </div>
         </div>
 
         <div class="row gy-4">
-          <?php foreach ($workshops as $index => $workshop): ?>
-          <!-- Workshop Card -->
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?= $index * 100 ?>">
-            <div class="card h-100 workshop-card">
-              <div class="position-absolute top-0 start-0 p-2">
-                <!-- Tampilkan Badge sesuai status workshop -->
-                <span class="badge bg-primary"><?= $workshop['status'] == 'terpopuler' ? 'Terpopuler' : ($workshop['status'] == 'hampir_penuh' ? 'Hampir Penuh' : 'Baru') ?></span>
+          <!-- Workshop Cards with Enhanced Design -->
+          <?php foreach ($workshops as $workshop): ?>
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="card workshop-card hover-effect">
+              <div class="card-badge">
+                <span class="badge bg-gradient"><?= $workshop['status'] ?></span>
               </div>
-              <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4" class="card-img-top" alt="<?= htmlspecialchars($workshop['title']) ?>">
-              <div class="card-body">
-                <span class="badge bg-primary mb-2"><?= htmlspecialchars($workshop['title']) ?></span>
-                <h3 class="card-title h5"><?= htmlspecialchars($workshop['title']) ?></h3>
-                <p class="card-text"><?= htmlspecialchars($workshop['description']) ?></p>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <small class="text-muted"><i class="bi bi-clock me-2"></i><?= $workshop['duration'] ?? 'N/A' ?> Hari</small>
-                  <small class="text-muted"><i class="bi bi-people me-2"></i><?= $workshop['seats'] ?? 'N/A' ?> Kursi</small>
-                  <small class="text-muted"><i class="bi bi-calendar me-2"></i><?= $workshop['start_date'] ?? 'TBD' ?></small>
+              <div class="card-image-wrapper">
+                <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="card-img-top" alt="<?= htmlspecialchars($workshop['title']) ?>">
+                <div class="overlay">
+                  <div class="overlay-content">
+
+                  </div>
                 </div>
-                <div class="d-flex justify-content-center mb-3">
-                  <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#workshopModal-<?= $workshop['workshop_id'] ?>">
-                    <i class="bi bi-eye me-2"></i>Lihat Detail
+              </div>
+              <div class="card-body">
+                <div class="category-badge">
+                  <span class="badge bg-soft-primary"><?= htmlspecialchars($workshop['category']) ?></span>
+                </div>
+                <h3 class="card-title h5"><?= htmlspecialchars($workshop['title']) ?></h3>
+                <p class="card-text text-muted"><?= htmlspecialchars(substr($workshop['description'], 0, 120)) ?>...</p>
+                <div class="workshop-info">
+                  <div class="info-item">
+                    <i class="bi bi-calendar-event"></i>
+                    <span><?= date('d M Y', strtotime($workshop['start_date'])) ?></span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <span><?= $workshop['location'] ?></span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-tag"></i>
+                    <span>Rp <?= number_format($workshop['price'], 0, ',', '.') ?></span>
+                  </div>
+                </div>
+                <div class="action-buttons mt-3">
+                  <button class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#workshopModal<?= $workshop['workshop_id'] ?>">
+                    <i class="bi bi-info-circle me-2"></i>Detail Workshop
                   </button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Modal for each Workshop -->
-            <div class="modal fade" id="workshopModal-<?= $workshop['id'] ?>" tabindex="-1" aria-labelledby="workshopModalLabel-<?= $workshop['id'] ?>" aria-hidden="true">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="workshopModalLabel-<?= $workshop['id'] ?>"><?= htmlspecialchars($workshop['title']) ?></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <!-- Enhanced Workshop Modal -->
+          <div class="modal fade" id="workshopModal<?= $workshop['workshop_id'] ?>" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header gradient-bg">
+                  <h5 class="modal-title text-white"><?= htmlspecialchars($workshop['title']) ?></h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="workshop-image-wrapper">
+                        <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($workshop['title']) ?>">
+                        <div class="workshop-highlights">
+                          <div class="highlight-item">
+                            <i class="bi bi-people-fill"></i>
+                            <span>30 Peserta</span>
+                          </div>
+                          <div class="highlight-item">
+                            <i class="bi bi-clock-fill"></i>
+                            <span>24 Jam</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="workshop-details">
+                        <div class="detail-item">
+                          <i class="bi bi-calendar-check-fill"></i>
+                          <div>
+                            <strong>Jadwal</strong>
+                            <p>Mulai: <?= date('d M Y H:i', strtotime($workshop['start_date'])) ?><br>
+                               Selesai: <?= date('d M Y H:i', strtotime($workshop['end_date'])) ?></p>
+                          </div>
+                        </div>
+                        <div class="detail-item">
+                          <i class="bi bi-geo-alt-fill"></i>
+                          <div>
+                            <strong>Lokasi</strong>
+                            <p><?= htmlspecialchars($workshop['location']) ?></p>
+                          </div>
+                        </div>
+                        <div class="detail-item">
+                          <i class="bi bi-tag-fill"></i>
+                          <div>
+                            <strong>Investasi</strong>
+                            <p>Rp <?= number_format($workshop['price'], 0, ',', '.') ?></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="modal-body">
-                    <h5>Deskripsi</h5>
-                    <p><?= htmlspecialchars($workshop['description']) ?></p>
-                    <h6><i class="bi bi-calendar me-2"></i>Mulai pada: <?= $workshop['start_date'] ?? 'TBD' ?></h6>
-                    <h6><i class="bi bi-clock me-2"></i>Durasi: <?= $workshop['duration'] ?? 'N/A' ?> Hari</h6>
-                    <h6><i class="bi bi-people me-2"></i>Sisa Kursi: <?= $workshop['seats'] ?? 'N/A' ?></h6>
+                  <div class="workshop-content mt-4">
+                    <div class="content-section">
+                      <h5><i class="bi bi-book me-2"></i>Overview Pelatihan</h5>
+                      <p><?= nl2br(htmlspecialchars($workshop['training_overview'])) ?></p>
+                    </div>
+                    <div class="content-section">
+                      <h5><i class="bi bi-trophy me-2"></i>Kompetensi yang Dilatih</h5>
+                      <p><?= nl2br(htmlspecialchars($workshop['trained_competencies'])) ?></p>
+                    </div>
+                    <div class="content-section">
+                      <h5><i class="bi bi-calendar3 me-2"></i>Sesi Pelatihan</h5>
+                      <p><?= nl2br(htmlspecialchars($workshop['training_session'])) ?></p>
+                    </div>
+                    <div class="content-section">
+                      <h5><i class="bi bi-check-circle me-2"></i>Persyaratan</h5>
+                      <p><?= nl2br(htmlspecialchars($workshop['requirements'])) ?></p>
+                    </div>
+                    <div class="content-section">
+                      <h5><i class="bi bi-gift me-2"></i>Manfaat</h5>
+                      <p><?= nl2br(htmlspecialchars($workshop['benefits'])) ?></p>
+                    </div>
                   </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <a href="path_to_register_page.php?workshop_id=<?= $workshop['id'] ?>" class="btn btn-primary">Daftar</a>
-                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+                  <?php if($isLogin): ?>
+                    <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn btn-primary">
+                      <i class="bi bi-arrow-right-circle me-2"></i>Daftar Sekarang
+                    </a>
+                  <?php else: ?>
+                    <a href="register.php" class="btn btn-primary">
+                      <i class="bi bi-person-plus me-2"></i>Daftar Sekarang
+                    </a>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
+          </div>
           <?php endforeach; ?>
         </div>
 
-        <!-- Workshop Navigation -->
-        <nav class="mt-5">
-          <ul class="pagination justify-content-center">
+        <!-- Enhanced Pagination -->
+        <nav class="mt-5" aria-label="Workshop navigation">
+          <ul class="pagination pagination-rounded justify-content-center">
             <li class="page-item">
               <a class="page-link" href="#" aria-label="Previous" id="prevPage">
-                <span aria-hidden="true">«</span>
+                <i class="bi bi-chevron-left"></i>
               </a>
             </li>
             <li class="page-item active"><a class="page-link" href="#">1</a></li>
@@ -356,12 +469,11 @@ $workshops = getWorkshopsWithMitra();
             <li class="page-item"><a class="page-link" href="#">3</a></li>
             <li class="page-item">
               <a class="page-link" href="#" aria-label="Next" id="nextPage">
-                <span aria-hidden="true">»</span>
+                <i class="bi bi-chevron-right"></i>
               </a>
             </li>
           </ul>
         </nav>
-
 
       </div>
 

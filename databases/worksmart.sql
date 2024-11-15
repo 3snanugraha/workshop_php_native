@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Nov 12, 2024 at 09:07 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.0.28
+-- Host: 127.0.0.1
+-- Generation Time: Nov 15, 2024 at 10:38 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -135,7 +135,8 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name
 (7, 'hartosup', '$2y$10$Q0vBLeJeWo3WuB8OYKXJFuKaTqrW/xnZpHs.fxTw4MFm4Svw6eIyO', 'Harto', 'Supratman', 'coba@gmail.com', '62823443324311', 'user', '2024-11-11 14:36:09', '2024-11-12 18:27:33'),
 (8, 'mitra_sss', '$2y$10$fgWyKsC4I8NkL5LyoeDZaOlvWJ8NLu4UyyaDF3jKUT3PJYDOuYisK', 'Mitra', 'Satu', 'mitrasatu@gmail.com', '6289235335225', 'mitra', '2024-11-11 21:25:10', '2024-11-12 19:04:48'),
 (9, 'mitra_2', '$2y$10$s9fYJqIDJsWu/1C2xeIbneJYUpqZMWuKiNx7p8BoHf9wqfIfRuDru', 'Mitra', 'Dua', 'mitradua@gmail.com', '62895339046899', 'mitra', '2024-11-11 21:26:07', '2024-11-11 21:26:07'),
-(18, 'mitratiga', '$2y$10$JXANhM21J9./i5G7yxXZE.cRTwA.fNHODjAxKaby94Niyj2kleEeK', 'Mitra', 'Tiga', 'mitra3@gmail.com', '62895339046899', 'mitra', '2024-11-12 19:01:17', '2024-11-12 19:01:17');
+(18, 'mitratiga', '$2y$10$JXANhM21J9./i5G7yxXZE.cRTwA.fNHODjAxKaby94Niyj2kleEeK', 'Mitra', 'Tiga', 'mitra3@gmail.com', '62895339046899', 'mitra', '2024-11-12 19:01:17', '2024-11-12 19:01:17'),
+(19, 'trisnanugraha', '$2y$10$CQCbw5fL5myhCAptcjCcJOmWkPcLzBpC4bsOBKbvc/tOKSQ5Yd1cq', 'Trisna', 'Nugraha', 'trisnanugraha87@gmail.com', '62895339046899', 'user', '2024-11-15 07:55:30', '2024-11-15 07:55:30');
 
 -- --------------------------------------------------------
 
@@ -148,6 +149,12 @@ CREATE TABLE `workshops` (
   `mitra_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
+  `banner` varchar(100) NOT NULL,
+  `training_overview` text NOT NULL,
+  `trained_competencies` text NOT NULL,
+  `training_session` text NOT NULL,
+  `requirements` text NOT NULL,
+  `benefits` text NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `location` varchar(255) DEFAULT NULL,
   `start_date` datetime NOT NULL,
@@ -161,9 +168,14 @@ CREATE TABLE `workshops` (
 -- Dumping data for table `workshops`
 --
 
-INSERT INTO `workshops` (`workshop_id`, `mitra_id`, `title`, `description`, `price`, `location`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
-(1, 8, 'Digital Marketing', 'Workshop ini membahas tentang pengembangan pribadi.', 100000.00, 'Jakarta', '2024-12-01 09:00:00', '2024-12-01 15:00:00', 'active', '2024-11-11 09:30:00', '2024-11-11 21:47:51'),
-(2, 9, 'Affiliate', 'Workshop tentang digital marketing dan strategi online.', 200000.00, 'Bandung', '2024-12-05 09:00:00', '2024-12-05 16:00:00', 'active', '2024-11-11 10:00:00', '2024-11-11 21:47:58');
+INSERT INTO `workshops` (`workshop_id`, `mitra_id`, `title`, `description`, `banner`, `training_overview`, `trained_competencies`, `training_session`, `requirements`, `benefits`, `price`, `location`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
+(3, 8, 'UI/UX Design', 'Pelatihan untuk menjadi desainer UI/UX profesional.', 'sample.jpg', 'Dasar-dasar desain UI/UX, riset pengguna, prototipe, dan testing.', 'Riset UX, Wireframing, Prototyping', '2 hari (8 jam/hari)', 'Laptop dengan software Figma atau Adobe XD', 'Sertifikat resmi, materi pelatihan, dan akses komunitas', 300000.00, 'Yogyakarta', '2024-12-10 08:00:00', '2024-12-11 16:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:00'),
+(4, 9, 'Data Science Basics', 'Pengantar analisis data untuk pemula.', 'sample.jpg', 'Pengantar Python, analisis data, dan visualisasi.', 'Python, Pandas, Matplotlib', '1 hari (8 jam)', 'Laptop dengan Python terinstal', 'Sertifikat resmi dan contoh dataset', 250000.00, 'Jakarta', '2024-12-15 09:00:00', '2024-12-15 17:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:05'),
+(5, 18, 'Public Speaking Mastery', 'Workshop untuk menguasai seni berbicara di depan umum.', 'sample.jpg', 'Strategi komunikasi efektif, melatih kepercayaan diri, dan penguasaan audiens.', 'Komunikasi verbal, penguasaan emosi', '1 hari (6 jam)', 'Antusiasme belajar', 'Sertifikat, rekaman sesi, dan konsultasi', 150000.00, 'Surabaya', '2024-12-20 10:00:00', '2024-12-20 16:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:08'),
+(6, 18, 'Digital Illustration', 'Belajar ilustrasi digital menggunakan tablet grafis.', 'sample.jpg', 'Teknik menggambar digital, pewarnaan, dan rendering.', 'Menguasai software CorelDRAW/Photoshop', '2 hari (6 jam/hari)', 'Laptop atau tablet grafis', 'Sertifikat, contoh desain, dan akses forum', 400000.00, 'Malang', '2024-12-25 09:00:00', '2024-12-26 15:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:11'),
+(7, 18, 'Business Strategy', 'Strategi membangun bisnis yang berkelanjutan.', 'sample.jpg', 'Analisis SWOT, manajemen risiko, dan inovasi bisnis.', 'Manajemen bisnis, strategi pasar', '1 hari (7 jam)', 'Antusiasme untuk bisnis', 'Sertifikat, workbook strategi bisnis', 500000.00, 'Bandung', '2024-12-30 09:00:00', '2024-12-30 16:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:14'),
+(8, 8, 'Photography Basics', 'Dasar-dasar fotografi untuk pemula.', 'sample.jpg', 'Pengaturan kamera, komposisi, dan editing dasar.', 'Keterampilan fotografi dasar', '1 hari (5 jam)', 'Kamera DSLR atau smartphone', 'Sertifikat dan hasil foto', 200000.00, 'Bali', '2025-01-05 08:00:00', '2025-01-05 13:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:17'),
+(9, 18, 'Cloud Computing', 'Pengantar komputasi awan untuk bisnis dan IT.', 'sample.jpg', 'Konsep dasar cloud, praktik AWS dan Azure.', 'Dasar cloud, manajemen data', '1 hari (6 jam)', 'Laptop dan akun AWS/Azure gratis', 'Sertifikat dan akses percobaan cloud', 450000.00, 'Semarang', '2025-01-10 09:00:00', '2025-01-10 15:00:00', 'active', '2024-11-15 09:02:38', '2024-11-15 09:11:19');
 
 -- --------------------------------------------------------
 
@@ -268,13 +280,13 @@ ALTER TABLE `registrations`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `workshops`
 --
 ALTER TABLE `workshops`
-  MODIFY `workshop_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `workshop_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `workshop_schedules`

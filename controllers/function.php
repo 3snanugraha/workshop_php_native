@@ -344,6 +344,9 @@ function countTotalEarnings() {
     }
 }
 
+// ========================================
+//          LANDING PAGE FUNCTION
+// ========================================
 // Fetch Untuk Landing Page
 function getWorkshopsWithMitra() {
     require '../databases/database.php';
@@ -354,19 +357,27 @@ function getWorkshopsWithMitra() {
             w.workshop_id,
             w.title,
             w.description,
+            w.banner,
             w.price,
             w.location,
             w.start_date,
             w.end_date,
             w.status,
+            w.training_overview,
+            w.trained_competencies,
+            w.training_session,
+            w.requirements,
+            w.benefits,
             m.user_id AS mitra_id,
             m.first_name AS mitra_first_name,
             m.last_name AS mitra_last_name,
             m.email AS mitra_email,
-            m.phone AS mitra_phone
+            m.phone AS mitra_phone,
+            DATEDIFF(w.end_date, w.start_date) + 1 AS duration_days
         FROM workshops w
         LEFT JOIN users m ON w.mitra_id = m.user_id
-        WHERE m.role = 'mitra'  -- Filter untuk role 'mitra'
+        WHERE m.role = 'mitra' AND w.status = 'active'
+        ORDER BY w.created_at DESC
     ";
 
     // Eksekusi query
@@ -379,6 +390,104 @@ function getWorkshopsWithMitra() {
     } else {
         return "Error fetching workshops: " . mysqli_error($conn);
     }
+}
+// ========================================
+//          SESSION FUNCTION
+// ========================================
+function checkUserSession() {
+    session_start();
+    if(!isset($_SESSION['user_id'])) {
+        return false;
+    }
+    return true;
+}
+
+
+// ========================================
+//          WORKSHOP CRUD
+// ========================================
+function createWorkshop($mitra_id, $title, $description, $banner, $training_overview, $trained_competencies, 
+                       $training_session, $requirements, $benefits, $price, $location, $start_date, $end_date, $status) {
+    global $conn;
+
+    $sql = "INSERT INTO workshops (mitra_id, title, description, banner, training_overview, 
+            trained_competencies, training_session, requirements, benefits, price, location, 
+            start_date, end_date, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("issssssssdssss", $mitra_id, $title, $description, $banner, 
+                      $training_overview, $trained_competencies, $training_session, 
+                      $requirements, $benefits, $price, $location, $start_date, $end_date, $status);
+
+    if ($stmt->execute()) {
+        return "Workshop berhasil dibuat.";
+    }
+    return "Gagal membuat workshop: " . $stmt->error;
+}
+
+function getAllWorkshops() {
+    require '../databases/database.php';
+    
+    $sql = "SELECT w.*, CONCAT(u.first_name, ' ', u.last_name) as mitra_name 
+            FROM workshops w 
+            LEFT JOIN users u ON w.mitra_id = u.user_id 
+            ORDER BY w.created_at DESC";
+    
+    $result = $conn->query($sql);
+    return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+function getWorkshopById($workshop_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT w.*, CONCAT(u.first_name, ' ', u.last_name) as mitra_name 
+            FROM workshops w 
+            LEFT JOIN users u ON w.mitra_id = u.user_id 
+            WHERE w.workshop_id = ?";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $workshop_id);
+    $stmt->execute();
+    
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+function updateWorkshop($workshop_id, $title, $description, $banner, $training_overview, 
+                       $trained_competencies, $training_session, $requirements, $benefits, 
+                       $price, $location, $start_date, $end_date, $status) {
+    global $conn;
+
+    $sql = "UPDATE workshops 
+            SET title = ?, description = ?, banner = ?, training_overview = ?, 
+                trained_competencies = ?, training_session = ?, requirements = ?, 
+                benefits = ?, price = ?, location = ?, start_date = ?, 
+                end_date = ?, status = ? 
+            WHERE workshop_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssssssdsssi", $title, $description, $banner, $training_overview, 
+                      $trained_competencies, $training_session, $requirements, $benefits, 
+                      $price, $location, $start_date, $end_date, $status, $workshop_id);
+
+    if ($stmt->execute()) {
+        return "Workshop berhasil diperbarui.";
+    }
+    return "Gagal memperbarui workshop: " . $stmt->error;
+}
+
+function deleteWorkshop($workshop_id) {
+    global $conn;
+    
+    $sql = "DELETE FROM workshops WHERE workshop_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $workshop_id);
+    
+    if ($stmt->execute()) {
+        return "Workshop berhasil dihapus.";
+    }
+    return "Gagal menghapus workshop: " . $stmt->error;
 }
 
 

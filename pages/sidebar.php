@@ -89,9 +89,43 @@
           </a>
         </li>
 
-      <?php elseif($_SESSION['role'] == 'peserta'): ?>
+      <?php elseif($_SESSION['role'] == 'user'): ?>
         <!-- Menu untuk peserta -->
-
+        <li class="nav-item">
+                  <a class="nav-link collapsed" href="dashboard.php">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                  </a>
+                </li>
+        
+                <li class="nav-item">
+                  <a class="nav-link collapsed" href="pembayaran.php">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Pembayaran</span>
+                  </a>
+                </li>
+        
+                <li class="nav-item">
+                  <a class="nav-link collapsed" href="aktivitas.php">
+                    <i class="bi bi-activity"></i>
+                    <span>Aktivitas</span>
+                  </a>
+                </li>
+        
+                <li class="nav-item">
+                  <a class="nav-link collapsed" href="rating.php">
+                    <i class="bi bi-star"></i>
+                    <span>Rating/Ulasan</span>
+                  </a>
+                </li>
+        
+                <li class="nav-item">
+                  <a class="nav-link collapsed" href="pesan.php">
+                    <i class="bi bi-envelope"></i>
+                    <span>Pesan</span>
+                  </a>
+                </li>
+        
       <?php elseif($_SESSION['role'] == 'mitra'): ?>
         <!-- Menu untuk mitra -->
 
