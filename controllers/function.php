@@ -293,4 +293,93 @@ function getEvents() {
 
     return $events;
 }
+
+// Rekap Data Keuangan
+function getFinancialData() {
+    require '../databases/database.php';
+    
+    $sql = "SELECT 
+            r.registration_id,
+            CONCAT(u.first_name, ' ', u.last_name) as nama_peserta,
+            w.title as nama_workshop,
+            w.price as harga_workshop,
+            p.amount as jumlah_bayar,
+            p.payment_method as metode_pembayaran,
+            p.payment_status as status_pembayaran,
+            DATE_FORMAT(p.payment_date, '%d/%m/%Y') as tanggal_pembayaran,
+            r.status as status_registrasi,
+            CONCAT(m.first_name, ' ', m.last_name) as nama_mitra  -- Menambahkan nama mitra
+            FROM registrations r
+            LEFT JOIN payments p ON r.registration_id = p.registration_id
+            LEFT JOIN users u ON r.user_id = u.user_id AND u.role = 'user'  -- Filter role untuk peserta
+            LEFT JOIN workshops w ON r.workshop_id = w.workshop_id
+            LEFT JOIN users m ON w.mitra_id = m.user_id AND m.role = 'mitra'  -- Join dengan pengguna yang memiliki role mitra
+            WHERE u.role = 'user'";  // Pastikan hanya peserta yang diambil
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+// // Fungsi untuk menghitung total penghasilan
+function countTotalEarnings() {
+    require '../databases/database.php';
+
+    // Query untuk menghitung total penghasilan dari pembayaran yang statusnya 'successful'
+    $sql = "SELECT SUM(p.amount) as total_penghasilan
+            FROM payments p
+            WHERE p.payment_status = 'successful'";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['total_penghasilan'];
+    } else {
+        return 0; // Jika tidak ada data, kembalikan 0
+    }
+}
+
+// Fetch Untuk Landing Page
+function getWorkshopsWithMitra() {
+    require '../databases/database.php';
+
+    // Query untuk mengambil semua data workshop dan relasikan dengan data mitra yang memiliki role 'mitra'
+    $query = "
+        SELECT 
+            w.workshop_id,
+            w.title,
+            w.description,
+            w.price,
+            w.location,
+            w.start_date,
+            w.end_date,
+            w.status,
+            m.user_id AS mitra_id,
+            m.first_name AS mitra_first_name,
+            m.last_name AS mitra_last_name,
+            m.email AS mitra_email,
+            m.phone AS mitra_phone
+        FROM workshops w
+        LEFT JOIN users m ON w.mitra_id = m.user_id
+        WHERE m.role = 'mitra'  -- Filter untuk role 'mitra'
+    ";
+
+    // Eksekusi query
+    $result = mysqli_query($conn, $query);
+
+    // Mengecek apakah query berhasil
+    if ($result) {
+        $workshops = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $workshops;
+    } else {
+        return "Error fetching workshops: " . mysqli_error($conn);
+    }
+}
+
+
 ?>
