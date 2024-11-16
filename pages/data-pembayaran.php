@@ -58,6 +58,18 @@ $payments = getPaymentData($_SESSION['user_id']);
       </nav>
     </div><!-- End Page Title -->
 
+
+    <?php if(isset($_SESSION['success'])): ?>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-1"></i>
+        <?php 
+          echo nl2br($_SESSION['success']);
+          unset($_SESSION['success']);
+        ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <?php endif; ?>
+
     <section class="section dashboard">
       <div class="row">
 
@@ -154,6 +166,21 @@ $payments = getPaymentData($_SESSION['user_id']);
                                     <div class="col-sm-8"><?= date('d/m/Y H:i', strtotime($payment['payment_date'])) ?></div>
                                   </div>
                                 </div>
+
+                                <div class="row mb-3 text-center">
+                                  <div class="col-sm-12 fw-bold">Bukti Pembayaran</div>
+                                  <div class="col-sm-12">
+                                    <?php if($payment['payment_receipt']): ?>
+                                      <img src="assets/img/payment/<?= $payment['payment_receipt'] ?>" 
+                                          class="img-fluid" 
+                                          alt="Bukti Pembayaran"
+                                          style="max-width: 300px;">
+                                    <?php else: ?>
+                                      <span class="text-muted">Bukti pembayaran belum diunggah</span>
+                                    <?php endif; ?>
+                                  </div>
+                                </div>
+
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                   <?php if($payment['payment_status'] == 'successful'): ?>

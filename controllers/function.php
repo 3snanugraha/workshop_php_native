@@ -525,4 +525,55 @@ function getPaymentData($user_id) {
     $result = $stmt->get_result();
     return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
+
+// Create workshop registration
+function createWorkshopRegistration($user_id, $workshop_id) {
+    global $conn;
+    $sql = "INSERT INTO registrations (user_id, workshop_id, status) 
+            VALUES (?, ?, 'registered')";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $user_id, $workshop_id);
+    
+    if($stmt->execute()) {
+        return $conn->insert_id;
+    }
+    return false;
+}
+
+// Handle payment receipt upload
+function handlePaymentUpload($file, $registration_id) {
+    $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
+    $max_size = 2 * 1024 * 1024; // 2MB
+    
+    if(!in_array($file['type'], $allowed_types)) {
+        return ['status' => false, 'message' => 'Format file harus JPG/PNG'];
+    }
+    
+    if($file['size'] > $max_size) {
+        return ['status' => false, 'message' => 'Ukuran file maksimal 2MB'];
+    }
+    
+    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = "INV-" . $registration_id . "." . $ext;
+    $upload_path = "../pages/assets/img/payment/" . $filename;
+    
+    if(move_uploaded_file($file['tmp_name'], $upload_path)) {
+        return ['status' => true, 'filename' => $filename];
+    }
+    
+    return ['status' => false, 'message' => 'Gagal mengupload file'];
+}
+
+// Create payment record
+function createPaymentRecord($registration_id, $amount, $payment_receipt, $bank_id) {
+    global $conn;
+    $sql = "INSERT INTO payments (registration_id, amount, payment_method, payment_status, payment_receipt, bank_id, payment_date) 
+            VALUES (?, ?, 'bank_transfer', 'pending', ?, ?, CURRENT_TIMESTAMP)";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("idsi", $registration_id, $amount, $payment_receipt, $bank_id);
+    return $stmt->execute();
+}
+
+
 ?>

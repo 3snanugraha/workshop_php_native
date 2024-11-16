@@ -9,6 +9,73 @@ require 'function.php';
 $db_path='../databases/database.php';
 $fe_path='../pages/';
 
+
+// Workshop Payment Processing
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bayar'])) {
+    require $db_path;
+    
+    // Validate input
+    $workshop_id = filter_input(INPUT_POST, 'workshop_id', FILTER_VALIDATE_INT);
+    $amount = filter_input(INPUT_POST, 'amount', FILTER_VALIDATE_FLOAT);
+    $bank_id = filter_input(INPUT_POST, 'bank_id', FILTER_VALIDATE_INT);
+
+    // Validate input with specific messages
+    if(!filter_input(INPUT_POST, 'workshop_id', FILTER_VALIDATE_INT)) {
+        $_SESSION['error'] = "ID Workshop tidak valid";
+        header("Location: ../pages/detail-workshop.php?workshop_id=" . $_POST['workshop_id']);
+        exit();
+    }
+
+    if(!filter_input(INPUT_POST, 'amount', FILTER_VALIDATE_FLOAT)) {
+        $_SESSION['error'] = "Jumlah pembayaran tidak valid";
+        header("Location: ../pages/detail-workshop.php?workshop_id=" . $_POST['workshop_id']);
+        exit();
+    }
+
+    if(!filter_input(INPUT_POST, 'bank_id', FILTER_VALIDATE_INT)) {
+        $_SESSION['error'] = "Bank tujuan belum dipilih";
+        header("Location: ../pages/detail-workshop.php?workshop_id=" . $_POST['workshop_id']);
+        exit();
+    }
+    
+    if(!$workshop_id || !$amount || !$bank_id) {
+        $_SESSION['error'] = "Data tidak valid";
+        header("Location: ../pages/detail-workshop.php?workshop_id=" . $_POST['workshop_id']);
+        exit();
+    }
+
+    // Begin transaction
+    $conn->begin_transaction();
+    
+    try {
+        // Create registration
+        $registration_id = createWorkshopRegistration($_SESSION['user_id'], $workshop_id);
+        if(!$registration_id) throw new Exception("Gagal membuat registrasi");
+
+        // Handle file upload
+        $upload_result = handlePaymentUpload($_FILES['payment_receipt'], $registration_id);
+        if(!$upload_result['status']) throw new Exception($upload_result['message']);
+
+        // Create payment record
+        $payment_success = createPaymentRecord($registration_id, $amount, $upload_result['filename'], $bank_id);
+        if(!$payment_success) throw new Exception("Gagal menyimpan data pembayaran");
+
+        // Commit transaction
+        $conn->commit();
+        $_SESSION['success'] = "🎉 Selamat! Pembayaran Anda telah berhasil diupload ✅ \n\nSaat ini pembayaran sedang dalam proses verifikasi oleh tim kami. \nMohon tunggu konfirmasi selanjutnya 🙏 \n\nTerima kasih atas kesabaran Anda! 💫";        
+        header("Location: ../pages/data-pembayaran.php");
+        
+    } catch(Exception $e) {
+        $conn->rollback();
+        $_SESSION['error'] = $e->getMessage();
+        header("Location: ../pages/detail-workshop.php?workshop_id=" . $workshop_id);
+    }
+    
+    exit();
+}
+
+
+
 // Menangani request untuk login
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     require $db_path;

@@ -300,8 +300,8 @@ $workshops = getAllWorkshops();
                       </div>
                   </div>
                   <div class="card-footer bg-transparent border-top-0">
-                      <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn brand-btn w-100">Lihat Detail</a>
-                  </div>
+                      <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn brand-btn w-100 rounded-pill"><i class="bi bi-cart-plus"></i> Pesan Sekarang</a>
+                  </div>              
               </div>
           </div>
           <?php } ?>

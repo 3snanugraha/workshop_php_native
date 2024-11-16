@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Nov 15, 2024 at 06:25 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.0.28
+-- Host: 127.0.0.1
+-- Generation Time: Nov 16, 2024 at 10:03 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,29 @@ SET time_zone = "+00:00";
 --
 -- Database: `worksmart`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `banks`
+--
+
+CREATE TABLE `banks` (
+  `bank_id` int(11) NOT NULL,
+  `bank_name` varchar(100) NOT NULL,
+  `account_name` varchar(100) NOT NULL,
+  `account_number` varchar(50) NOT NULL,
+  `swift_code` varchar(50) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `banks`
+--
+
+INSERT INTO `banks` (`bank_id`, `bank_name`, `account_name`, `account_number`, `swift_code`, `is_active`, `created_at`) VALUES
+(1, 'BRI', 'Trisna Nugraha', '404201024853536', '24', 1, '2024-11-16 19:59:19');
 
 -- --------------------------------------------------------
 
@@ -70,17 +93,19 @@ CREATE TABLE `payments` (
   `amount` decimal(10,2) NOT NULL,
   `payment_date` datetime DEFAULT current_timestamp(),
   `payment_method` enum('bank_transfer','e-wallet') NOT NULL,
-  `payment_status` enum('successful','failed') NOT NULL DEFAULT 'failed'
+  `payment_status` enum('successful','pending','failed') NOT NULL,
+  `payment_receipt` varchar(50) NOT NULL,
+  `bank_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `payments`
 --
 
-INSERT INTO `payments` (`payment_id`, `registration_id`, `amount`, `payment_date`, `payment_method`, `payment_status`) VALUES
-(1, 1, 100000.00, '2024-11-11 15:12:00', 'bank_transfer', 'failed'),
-(2, 2, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'failed'),
-(3, 3, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'successful');
+INSERT INTO `payments` (`payment_id`, `registration_id`, `amount`, `payment_date`, `payment_method`, `payment_status`, `payment_receipt`, `bank_id`) VALUES
+(1, 1, 100000.00, '2024-11-11 15:12:00', 'bank_transfer', 'successful', 'INV-1.jpg', 1),
+(2, 2, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'successful', 'INV-2.jpg', 1),
+(3, 3, 200000.00, '2024-11-11 15:35:00', 'bank_transfer', 'successful', 'INV-3.jpg', 1);
 
 -- --------------------------------------------------------
 
@@ -94,7 +119,6 @@ CREATE TABLE `registrations` (
   `workshop_id` int(11) NOT NULL,
   `registration_date` datetime DEFAULT current_timestamp(),
   `status` enum('registered','cancelled','completed') NOT NULL DEFAULT 'registered',
-  `payment_status` enum('paid','pending','failed') NOT NULL DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -103,10 +127,10 @@ CREATE TABLE `registrations` (
 -- Dumping data for table `registrations`
 --
 
-INSERT INTO `registrations` (`registration_id`, `user_id`, `workshop_id`, `registration_date`, `status`, `payment_status`, `created_at`, `updated_at`) VALUES
-(1, 1, 3, '2024-11-11 15:10:00', 'registered', 'paid', '2024-11-11 08:10:00', '2024-11-15 16:56:33'),
-(2, 7, 3, '2024-11-11 15:30:00', 'registered', 'pending', '2024-11-11 08:30:00', '2024-11-15 16:56:36'),
-(3, 19, 3, '2024-11-11 15:30:00', 'registered', 'paid', '2024-11-11 08:30:00', '2024-11-15 16:56:39');
+INSERT INTO `registrations` (`registration_id`, `user_id`, `workshop_id`, `registration_date`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 3, '2024-11-11 15:10:00', 'registered', '2024-11-11 08:10:00', '2024-11-15 16:56:33'),
+(2, 7, 3, '2024-11-11 15:30:00', 'registered', '2024-11-11 08:30:00', '2024-11-15 16:56:36'),
+(3, 19, 3, '2024-11-11 15:30:00', 'registered', '2024-11-11 08:30:00', '2024-11-15 16:56:39');
 
 -- --------------------------------------------------------
 
@@ -138,7 +162,8 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name
 (8, 'mitra_sss', '$2y$10$fgWyKsC4I8NkL5LyoeDZaOlvWJ8NLu4UyyaDF3jKUT3PJYDOuYisK', 'Mitra', 'Satu', 'mitrasatu@gmail.com', '6289235335225', 'mitra', '2024-11-11 21:25:10', '2024-11-12 19:04:48'),
 (9, 'mitra_2', '$2y$10$s9fYJqIDJsWu/1C2xeIbneJYUpqZMWuKiNx7p8BoHf9wqfIfRuDru', 'Mitra', 'Dua', 'mitradua@gmail.com', '62895339046899', 'mitra', '2024-11-11 21:26:07', '2024-11-11 21:26:07'),
 (18, 'mitratiga', '$2y$10$JXANhM21J9./i5G7yxXZE.cRTwA.fNHODjAxKaby94Niyj2kleEeK', 'Mitra', 'Tiga', 'mitra3@gmail.com', '62895339046899', 'mitra', '2024-11-12 19:01:17', '2024-11-12 19:01:17'),
-(19, 'trisnanugraha', '$2y$10$CQCbw5fL5myhCAptcjCcJOmWkPcLzBpC4bsOBKbvc/tOKSQ5Yd1cq', 'Trisna', 'Nugraha', 'trisnanugraha87@gmail.com', '62895339046899', 'user', '2024-11-15 07:55:30', '2024-11-15 07:55:30');
+(19, 'trisnanugraha', '$2y$10$CQCbw5fL5myhCAptcjCcJOmWkPcLzBpC4bsOBKbvc/tOKSQ5Yd1cq', 'Trisna', 'Nugraha', 'trisnanugraha87@gmail.com', '62895339046899', 'user', '2024-11-15 07:55:30', '2024-11-15 07:55:30'),
+(20, 'trisnanugraha1', '$2y$10$e/CNw2pRDprQbqlkJEZk/OvrthRr/Uq/JubHepU5Lx2QqfEwvSJcS', 'Trisna', 'Nugraha', 'trisnanugraha878@gmail.com', '62895339046899', 'user', '2024-11-16 19:35:52', '2024-11-16 19:35:52');
 
 -- --------------------------------------------------------
 
@@ -207,6 +232,12 @@ INSERT INTO `workshop_schedules` (`schedule_id`, `workshop_id`, `date`, `start_t
 --
 
 --
+-- Indexes for table `banks`
+--
+ALTER TABLE `banks`
+  ADD PRIMARY KEY (`bank_id`);
+
+--
 -- Indexes for table `feedback`
 --
 ALTER TABLE `feedback`
@@ -222,7 +253,8 @@ ALTER TABLE `notifications`
 -- Indexes for table `payments`
 --
 ALTER TABLE `payments`
-  ADD PRIMARY KEY (`payment_id`);
+  ADD PRIMARY KEY (`payment_id`),
+  ADD KEY `bank_id` (`bank_id`);
 
 --
 -- Indexes for table `registrations`
@@ -255,6 +287,12 @@ ALTER TABLE `workshop_schedules`
 --
 
 --
+-- AUTO_INCREMENT for table `banks`
+--
+ALTER TABLE `banks`
+  MODIFY `bank_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
@@ -282,7 +320,7 @@ ALTER TABLE `registrations`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `workshops`
@@ -295,6 +333,16 @@ ALTER TABLE `workshops`
 --
 ALTER TABLE `workshop_schedules`
   MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`bank_id`) REFERENCES `banks` (`bank_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
