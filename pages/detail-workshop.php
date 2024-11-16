@@ -127,7 +127,7 @@ checkAuth();
                                     <h5 class="card-title">Daftar Sekarang</h5>
                                     <div class="d-grid gap-2">
                                         <?php if($data['status'] == 'active'): ?>
-                                            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#registerWorkshopModal">
+                                            <button class="btn brand-btn" type="button" data-bs-toggle="modal" data-bs-target="#registerWorkshopModal">
                                                 <i class="bi bi-cart-fill"></i> Beli Sekarang
                                             </button>
                                             <button class="btn btn-outline-info" type="button">
