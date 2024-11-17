@@ -1,73 +1,127 @@
 <?php
 require '../controllers/function.php';
-checkAuth();
-
-// Set default values or get from POST
-$kategori = isset($_POST['kategori']) ? $_POST['kategori'] : '';
-$start_date = isset($_POST['start_date']) ? $_POST['start_date'] : '';
-$end_date = isset($_POST['end_date']) ? $_POST['end_date'] : '';
-
-
 require '../databases/database.php';
+checkAuth();
+// At the top after checkAuth()
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get POST data with validation
+$kategori = $_POST['kategori'] ?? '';
+$start_date = $_POST['start_date'] ?? date('Y-m-d');
+$end_date = $_POST['end_date'] ?? date('Y-m-d');
+$role = $_SESSION['role'];
+$user_id = $_SESSION['user_id'];
+
+// Format dates for query
+$formatted_start_date = date('Y-m-d', strtotime($start_date));
+$formatted_end_date = date('Y-m-d', strtotime($end_date));
 
 // Initialize variables
 $query = '';
 $headers = [];
+$data = [];
 
 // Only proceed if kategori is not empty
 if (!empty($kategori)) {
     switch($kategori) {
         case 'Peserta':
-            $query = "SELECT first_name, last_name, username, email, phone, DATE_FORMAT(created_at, '%d/%m/%Y') as created_at 
-                     FROM users 
-                     WHERE role = 'user' 
-                     AND DATE(created_at) BETWEEN '$start_date' AND '$end_date'";
+            if($role == 'mitra') {
+                $query = "SELECT DISTINCT u.first_name, u.last_name, u.username, u.email, u.phone, 
+                         DATE_FORMAT(r.registration_date, '%d/%m/%Y') as registration_date
+                         FROM users u 
+                         JOIN registrations r ON u.user_id = r.user_id
+                         JOIN workshops w ON r.workshop_id = w.workshop_id
+                         WHERE u.role = 'user' AND w.mitra_id = $user_id
+                         AND DATE(r.registration_date) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+            } else {
+                $query = "SELECT first_name, last_name, username, email, phone, 
+                         DATE_FORMAT(created_at, '%d/%m/%Y') as created_at 
+                         FROM users 
+                         WHERE role = 'user' 
+                         AND DATE(created_at) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+            }
             $headers = ['Nama Depan', 'Nama Belakang', 'Username', 'Email', 'No. Telepon', 'Tanggal Registrasi'];
             break;
             
         case 'Mitra':
-            $query = "SELECT first_name, last_name, username, email, phone, DATE_FORMAT(created_at, '%d/%m/%Y') as created_at 
-                     FROM users 
-                     WHERE role = 'mitra' 
-                     AND DATE(created_at) BETWEEN '$start_date' AND '$end_date'";
-            $headers = ['Nama Depan', 'Nama Belakang', 'Username', 'Email', 'No. Telepon', 'Tanggal Registrasi'];
+            if($role == 'admin') {
+                $query = "SELECT first_name, last_name, username, email, phone, 
+                         DATE_FORMAT(created_at, '%d/%m/%Y') as created_at 
+                         FROM users 
+                         WHERE role = 'mitra' 
+                         AND DATE(created_at) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+                $headers = ['Nama Depan', 'Nama Belakang', 'Username', 'Email', 'No. Telepon', 'Tanggal Registrasi'];
+            }
             break;
 
         case 'Keuangan':
-            $query = "SELECT 
-                r.registration_id,
-                CONCAT(u.first_name, ' ', u.last_name) as nama_peserta,
-                w.title as nama_workshop,
-                w.price as harga_workshop,
-                p.amount as jumlah_bayar,
-                p.payment_method as metode_pembayaran,
-                p.payment_status as status_pembayaran,
-                DATE_FORMAT(p.payment_date, '%d/%m/%Y') as tanggal_pembayaran,
-                r.status as status_registrasi
-                FROM registrations r
-                LEFT JOIN payments p ON r.registration_id = p.registration_id
-                LEFT JOIN users u ON r.user_id = u.user_id
-                LEFT JOIN workshops w ON r.workshop_id = w.workshop_id
-                WHERE DATE(r.created_at) BETWEEN '$start_date' AND '$end_date'";
+            if($role == 'mitra') {
+                $query = "SELECT 
+                    r.registration_id,
+                    CONCAT(u.first_name, ' ', u.last_name) as nama_peserta,
+                    w.title as nama_workshop,
+                    w.price as harga_workshop,
+                    p.amount as jumlah_bayar,
+                    p.payment_method as metode_pembayaran,
+                    p.payment_status as status_pembayaran,
+                    DATE_FORMAT(p.payment_date, '%d/%m/%Y') as tanggal_pembayaran,
+                    r.status as status_registrasi
+                    FROM registrations r
+                    LEFT JOIN payments p ON r.registration_id = p.registration_id
+                    LEFT JOIN users u ON r.user_id = u.user_id
+                    LEFT JOIN workshops w ON r.workshop_id = w.workshop_id
+                    WHERE w.mitra_id = $user_id
+                    AND DATE(r.created_at) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+            } else {
+                $query = "SELECT 
+                    r.registration_id,
+                    CONCAT(u.first_name, ' ', u.last_name) as nama_peserta,
+                    w.title as nama_workshop,
+                    w.price as harga_workshop,
+                    p.amount as jumlah_bayar,
+                    p.payment_method as metode_pembayaran,
+                    p.payment_status as status_pembayaran,
+                    DATE_FORMAT(p.payment_date, '%d/%m/%Y') as tanggal_pembayaran,
+                    r.status as status_registrasi
+                    FROM registrations r
+                    LEFT JOIN payments p ON r.registration_id = p.registration_id
+                    LEFT JOIN users u ON r.user_id = u.user_id
+                    LEFT JOIN workshops w ON r.workshop_id = w.workshop_id
+                    WHERE DATE(r.created_at) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+            }
             $headers = ['ID Registrasi', 'Nama Peserta', 'Workshop', 'Harga Workshop', 'Jumlah Bayar', 'Metode Pembayaran', 'Status Pembayaran', 'Tanggal Pembayaran', 'Status Registrasi'];
             break;
     }
 }
 
-// Only execute query if it's not empty
+// Execute query and format data
 $data = [];
 if (!empty($query)) {
     $result = $conn->query($query);
-    $data = $result->fetch_all(MYSQLI_ASSOC);
+    if (!$result) {
+        die("Query failed: " . $conn->error);
+    }
+    if ($result) {
+        $data = $result->fetch_all(MYSQLI_ASSOC);
 
-    // Format currency for keuangan report
-    if ($kategori === 'Keuangan') {
-        foreach ($data as &$row) {
-            $row['harga_workshop'] = 'Rp. ' . number_format($row['harga_workshop'], 0, ',', '.');
-            $row['jumlah_bayar'] = 'Rp. ' . number_format($row['jumlah_bayar'], 0, ',', '.');
+        // Format currency for keuangan report
+        if ($kategori === 'Keuangan') {
+            foreach ($data as &$row) {
+                if(isset($row['harga_workshop'])) {
+                    $row['harga_workshop'] = 'Rp. ' . number_format((float)$row['harga_workshop'], 0, ',', '.');
+                }
+                if(isset($row['jumlah_bayar'])) {
+                    $row['jumlah_bayar'] = 'Rp. ' . number_format((float)$row['jumlah_bayar'], 0, ',', '.');
+                }
+            }
         }
     }
 }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -147,7 +201,7 @@ if (!empty($query)) {
         <div class="company-name">WorkSmart</div>
     </div>
     
-    <div class="header">
+    <div class="header">    
         <h2>Laporan Data <?= ucfirst($kategori) ?></h2>
         <div class="periode">
             Periode: <?= date('d/m/Y', strtotime($start_date)) ?> - <?= date('d/m/Y', strtotime($end_date)) ?>

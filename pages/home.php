@@ -258,7 +258,7 @@ ini_set('display_errors', 1);
       </div>
 
     </section>
-    <!-- /About Section -->s
+    <!-- /About Section -->
 
     <!-- Workshops Section -->
     <section id="workshops" class="workshops section">

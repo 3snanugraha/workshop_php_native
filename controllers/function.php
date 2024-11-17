@@ -239,11 +239,26 @@ function getMonthlyParticipants() {
 function getEvents() {
     require '../databases/database.php';
     
+    // Get user role and ID from session
+    $role = $_SESSION['role'];
+    $user_id = $_SESSION['user_id'];
+    
+    // Base SQL query
     $sql = "SELECT title, start_date AS start, end_date AS end FROM workshops WHERE status = 'active'";
-    $result = $conn->query($sql);
+    
+    // Add mitra filter if user is mitra
+    if ($role === 'mitra') {
+        $sql .= " AND mitra_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } else {
+        // For admin, fetch all workshops
+        $result = $conn->query($sql);
+    }
 
     $events = [];
-
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $events[] = [
@@ -256,6 +271,7 @@ function getEvents() {
 
     return $events;
 }
+
 
 // Rekap Data Keuangan
 function getFinancialData() {
@@ -422,6 +438,7 @@ function checkAdmin() {
 // ========================================
 //          WORKSHOP CRUD
 // ========================================
+// Buat workshop oleh mitra
 function createWorkshop($mitra_id, $title, $description, $banner, $training_overview, $trained_competencies, 
                        $training_session, $requirements, $benefits, $price, $location, $start_date, $end_date, $status) {
     global $conn;
@@ -442,6 +459,39 @@ function createWorkshop($mitra_id, $title, $description, $banner, $training_over
     return "Gagal membuat workshop: " . $stmt->error;
 }
 
+// Upload banner oleh mitra
+function handleBannerUpload($file) {
+    $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
+    $max_size = 2 * 1024 * 1024; // 2MB
+    
+    // Check upload directory
+    $upload_dir = "../pages/assets/img/workshops/";
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    // Validate file
+    if (!in_array($file['type'], $allowed_types)) {
+        throw new Exception('Format file harus JPG/PNG');
+    }
+    
+    if ($file['size'] > $max_size) {
+        throw new Exception('Ukuran file maksimal 2MB');
+    }
+    
+    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = "WS-" . time() . "." . $ext;
+    $upload_path = $upload_dir . $filename;
+    
+    if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+        return $filename;
+    }
+    
+    throw new Exception('Gagal mengupload file');
+}
+
+
+// Get data workshop
 function getAllWorkshops() {
     require '../databases/database.php';
     
@@ -503,7 +553,8 @@ function updateWorkshop($workshop_id, $title, $description, $banner, $training_o
             WHERE workshop_id = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssssdsssi", $title, $description, $banner, $training_overview, 
+    // Added 'i' at the end for workshop_id parameter
+    $stmt->bind_param("ssssssssdssssi", $title, $description, $banner, $training_overview, 
                       $trained_competencies, $training_session, $requirements, $benefits, 
                       $price, $location, $start_date, $end_date, $status, $workshop_id);
 
@@ -513,6 +564,7 @@ function updateWorkshop($workshop_id, $title, $description, $banner, $training_o
     return "Gagal memperbarui workshop: " . $stmt->error;
 }
 
+// Hapus workshop
 function deleteWorkshop($workshop_id) {
     global $conn;
     
@@ -541,6 +593,93 @@ function deleteWorkshop($workshop_id) {
         return "Workshop berhasil dihapus.";
     }
     return "Gagal menghapus workshop: " . $stmt->error;
+}
+// ==================
+// Dashboard Mitra
+// ==================
+// Count total earnings for specific mitra
+function countMitraEarnings($mitra_id) {
+    require '../databases/database.php';
+    $sql = "SELECT SUM(p.amount) as total_earnings
+            FROM payments p
+            JOIN registrations r ON p.registration_id = r.registration_id
+            JOIN workshops w ON r.workshop_id = w.workshop_id
+            WHERE w.mitra_id = ? AND p.payment_status = 'successful'";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $mitra_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['total_earnings'] ?? 0;
+}
+
+// Count participants for specific mitra's workshops
+function countMitraParticipants($mitra_id) {
+    require '../databases/database.php';
+    $sql = "SELECT COUNT(DISTINCT r.user_id) as total_participants
+            FROM registrations r
+            JOIN workshops w ON r.workshop_id = w.workshop_id
+            WHERE w.mitra_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $mitra_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['total_participants'] ?? 0;
+}
+
+// Count workshops for specific mitra
+function countMitraWorkshops($mitra_id) {
+    require '../databases/database.php';
+    $sql = "SELECT COUNT(*) as total_workshops FROM workshops WHERE mitra_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $mitra_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['total_workshops'] ?? 0;
+}
+
+// Get monthly participants for mitra's workshops
+function getMitraMonthlyParticipants($mitra_id) {
+    require '../databases/database.php';
+    $monthlyParticipants = array_fill(0, 12, 0);
+    
+    $sql = "SELECT MONTH(r.registration_date) as month, COUNT(*) as total
+            FROM registrations r
+            JOIN workshops w ON r.workshop_id = w.workshop_id
+            WHERE w.mitra_id = ?
+            GROUP BY MONTH(r.registration_date)";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $mitra_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    while($row = $result->fetch_assoc()) {
+        $monthlyParticipants[$row['month']-1] = $row['total'];
+    }
+    
+    return $monthlyParticipants;
+}
+
+// Get quick list of mitra's workshops
+function getMitraWorkshopsList($mitra_id) {
+    require '../databases/database.php';
+    $sql = "SELECT workshop_id, title, status, 
+            (SELECT COUNT(*) FROM registrations WHERE workshop_id = workshops.workshop_id) as participant_count
+            FROM workshops 
+            WHERE mitra_id = ?
+            ORDER BY created_at DESC
+            LIMIT 5";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $mitra_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
 
@@ -635,6 +774,89 @@ function createPaymentRecord($registration_id, $amount, $payment_receipt, $bank_
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("idsi", $registration_id, $amount, $payment_receipt, $bank_id);
+    return $stmt->execute();
+}
+// ======================================
+// FITUR CHAT
+// ======================================
+// Get all chat contacts for current user
+function getChatContacts($user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT DISTINCT 
+            u.user_id,
+            u.first_name,
+            u.last_name,
+            u.role,
+            u.username,
+            (SELECT message 
+             FROM chats 
+             WHERE (sender_id = u.user_id AND receiver_id = ?) 
+                OR (sender_id = ? AND receiver_id = u.user_id)
+             ORDER BY sent_at DESC 
+             LIMIT 1) as last_message,
+            (SELECT sent_at 
+             FROM chats 
+             WHERE (sender_id = u.user_id AND receiver_id = ?) 
+                OR (sender_id = ? AND receiver_id = u.user_id)
+             ORDER BY sent_at DESC 
+             LIMIT 1) as last_message_time,
+            (SELECT COUNT(*) 
+             FROM chats 
+             WHERE sender_id = u.user_id 
+             AND receiver_id = ? 
+             AND is_read = 0) as unread_count
+            FROM users u
+            JOIN chats c ON u.user_id = c.sender_id OR u.user_id = c.receiver_id
+            WHERE (c.sender_id = ? OR c.receiver_id = ?)
+            AND u.user_id != ?
+            GROUP BY u.user_id
+            ORDER BY last_message_time DESC";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiiiiiii", $user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Get chat history between two users
+function getChatHistory($sender_id, $receiver_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT c.*, 
+            CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+            CONCAT(r.first_name, ' ', r.last_name) as receiver_name
+            FROM chats c
+            JOIN users s ON c.sender_id = s.user_id
+            JOIN users r ON c.receiver_id = r.user_id
+            WHERE (c.sender_id = ? AND c.receiver_id = ?)
+            OR (c.sender_id = ? AND c.receiver_id = ?)
+            ORDER BY c.sent_at ASC";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiii", $sender_id, $receiver_id, $receiver_id, $sender_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Send new message
+function sendMessage($sender_id, $receiver_id, $message) {
+    require '../databases/database.php';
+    
+    $sql = "INSERT INTO chats (sender_id, receiver_id, message) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iis", $sender_id, $receiver_id, $message);
+    return $stmt->execute();
+}
+
+// Mark messages as read
+function markMessagesAsRead($sender_id, $receiver_id) {
+    require '../databases/database.php';
+    
+    $sql = "UPDATE chats SET is_read = 1 
+            WHERE sender_id = ? AND receiver_id = ? AND is_read = 0";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $sender_id, $receiver_id);
     return $stmt->execute();
 }
 

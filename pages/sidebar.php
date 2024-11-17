@@ -155,12 +155,12 @@
                   </a>
                   <ul id="laporan-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
-                      <a href="laporan-peserta.php">
+                      <a href="laporan.php?kategori=Peserta">
                         <i class="bi bi-circle"></i><span>Peserta</span>
                       </a>
                     </li>
                     <li>
-                      <a href="laporan-keuangan.php">
+                      <a href="laporan.php?kategori=Keuangan">
                         <i class="bi bi-circle"></i><span>Keuangan</span>
                       </a>
                     </li>
@@ -179,7 +179,8 @@
                     <i class="bi bi-envelope"></i>
                     <span>Pesan</span>
                   </a>
-                </li>      <?php endif; ?>
+                </li>      
+      <?php endif; ?>
     </ul>
 
   </aside>

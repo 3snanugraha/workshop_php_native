@@ -68,8 +68,9 @@ $kategori = $_GET['kategori'];
                 Laporan Data <?= ucfirst($kategori) ?>
               </h5>
 
-              <form id="reportForm" class="row g-3">
-                <div class="col-md-6">
+              <form id="reportForm" action="print_laporan.php" method="POST" target="_blank">
+                <input type="hidden" name="kategori" value="<?= $kategori ?>">
+                <div class="col-md-12">
                   <div class="form-group">
                     <label class="form-label fw-bold">Periode Awal</label>
                     <div class="input-group">
@@ -79,7 +80,7 @@ $kategori = $_GET['kategori'];
                   </div>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-12">
                   <div class="form-group">
                     <label class="form-label fw-bold">Periode Akhir</label>
                     <div class="input-group">

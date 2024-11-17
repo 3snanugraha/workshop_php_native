@@ -122,3 +122,83 @@
         </div>
     </div>
     </div>    
+
+<!-- Modal Tambah Workshop -->
+<div class="modal fade" id="tambahWorkshop" tabindex="-1" aria-labelledby="tambahWorkshopLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header brand-bg-color text-white">
+                <h5 class="modal-title" id="tambahWorkshopLabel"><i class="bi bi-plus-circle me-2"></i>Tambah Workshop Baru</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="../controllers/controller.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="banner" class="form-label">Banner</label>
+                        <input type="file" class="form-control" id="banner" name="banner" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="training_overview" class="form-label">Training Overview</label>
+                        <textarea class="form-control" id="training_overview" name="training_overview" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="trained_competencies" class="form-label">Competencies</label>
+                        <textarea class="form-control" id="trained_competencies" name="trained_competencies" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="training_session" class="form-label">Session</label>
+                        <input type="text" class="form-control" id="training_session" name="training_session" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="requirements" class="form-label">Requirements</label>
+                        <textarea class="form-control" id="requirements" name="requirements" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="benefits" class="form-label">Benefits</label>
+                        <textarea class="form-control" id="benefits" name="benefits" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="number" class="form-control" id="price" name="price" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="createWorkshop" class="btn btn-primary brand-bg-color">Add Workshop</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

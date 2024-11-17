@@ -74,6 +74,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bayar'])) {
     exit();
 }
 
+
+// Tambah workshop oleh Mitra
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createWorkshop'])) {
+    $auth = checkMitraAuth();
+    if (!$auth) {
+        echo "<script>alert('Anda tidak diizinkan untuk operasi ini.');window.location='../pages/index.php';</script>";
+        exit();
+    }
+    
+    require $db_path;
+    
+    $banner = handleBannerUpload($_FILES['banner']);
+    
+    $createResult = createWorkshop(
+        $_SESSION['user_id'], // mitra_id from session
+        $_POST['title'],
+        $_POST['description'],
+        $banner,
+        $_POST['training_overview'],
+        $_POST['trained_competencies'],
+        $_POST['training_session'],
+        $_POST['requirements'],
+        $_POST['benefits'],
+        $_POST['price'],
+        $_POST['location'],
+        $_POST['start_date'],
+        $_POST['end_date'],
+        'active' // default status for new workshop
+    );
+
+    echo "<script>alert('$createResult');window.location='../pages/data-workshop.php';</script>";
+}
+
+
+// Update Workshop oleh Mitra
+// In controller.php
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateWorkshop'])) {
+    $auth = checkMitraAuth();
+    if (!$auth) {
+        echo "<script>alert('Anda tidak diizinkan untuk operasi ini.');window.location='../pages/index.php';</script>";
+        exit();
+    }
+    
+    require $db_path;
+    
+    // Get current banner if no new file uploaded
+    $banner = !empty($_FILES['banner']['name']) ? handleBannerUpload($_FILES['banner']) : $_POST['old_banner'];
+    
+    $updateResult = updateWorkshop(
+        $_POST['workshop_id'],
+        $_POST['title'],
+        $_POST['description'],
+        $banner,
+        $_POST['training_overview'],
+        $_POST['trained_competencies'],
+        $_POST['training_session'],
+        $_POST['requirements'],
+        $_POST['benefits'],
+        $_POST['price'],
+        $_POST['location'],
+        $_POST['start_date'],
+        $_POST['end_date'],
+        $_POST['status']
+    );
+
+    echo "<script>alert('$updateResult');window.location='../pages/data-workshop.php';</script>";
+}
+
+
+
 // Handler for deleting workshop
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteWorkshop'])) {
     $auth = checkMitraAuth();

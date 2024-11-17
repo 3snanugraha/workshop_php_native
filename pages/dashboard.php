@@ -306,7 +306,97 @@ $workshops = getAllWorkshops();
           </div>
           <?php } ?>
       </div>
+      <!-- Dashboard Mitra-->
+      <?php }else if($role=='mitra'){ ?>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    <!-- Earnings Card -->
+                    <div class="col-xxl-4 col-md-4">
+                        <div class="card info-card sales-card">
+                            <div class="card-body">
+                                <h5 class="card-title brand-color">Total Pemasukan</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>Rp <?= number_format(countMitraEarnings($_SESSION['user_id']), 0, ',', '.') ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Participants Card -->
+                    <div class="col-xxl-4 col-md-4">
+                        <div class="card info-card revenue-card">
+                            <div class="card-body">
+                                <h5 class="card-title brand-color">Total Peserta</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6><?= countMitraParticipants($_SESSION['user_id']) ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workshops Card -->
+                    <div class="col-xxl-4 col-md-4">
+                        <div class="card info-card customers-card">
+                            <div class="card-body">
+                                <h5 class="card-title brand-color">Total Workshop</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6><?= countMitraWorkshops($_SESSION['user_id']) ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Participants Chart -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title brand-color">Statistik Peserta Workshop</h5>
+                                <canvas id="mitraParticipantsChart" style="max-height: 400px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workshop List -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title brand-color">Workshop Saya</h5>
+                                <div class="activity">
+                                    <?php 
+                                    $mitraWorkshops = getMitraWorkshopsList($_SESSION['user_id']);
+                                    foreach($mitraWorkshops as $workshop) { 
+                                    ?>
+                                    <div class="activity-item d-flex">
+                                        <div class="activite-label"><?= $workshop['participant_count'] ?></div>
+                                        <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                                        <div class="activity-content">
+                                            <a href="data-workshop.php"><?= $workshop['title'] ?></a>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
       <?php } ?>
     </section>  
   </main><!-- End #main -->
@@ -329,84 +419,106 @@ $workshops = getAllWorkshops();
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/autohide.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Data peserta per bulan dari PHP
-      const monthlyParticipants = <?= json_encode($monthlyParticipants); ?>;
+<!-- Template Main JS File -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/autohide.js"></script>
+<script>
+// Single DOMContentLoaded event handler
+document.addEventListener("DOMContentLoaded", () => {
+    // Initialize search if user dashboard
+    const searchInput = document.getElementById('searchWorkshop');
+    if (searchInput) {
+        initWorkshopSearch(searchInput);
+    }
 
-      // Konfigurasi dan inisialisasi chart
-      new Chart(document.querySelector('#barChart_peserta'), {
-        type: 'bar',
-        data: {
-          labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-          datasets: [{
-            label: 'Peserta Terdaftar',
-            data: monthlyParticipants,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(255, 159, 64, 0.2)',
-              'rgba(255, 205, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(201, 203, 207, 0.2)',
-              'rgba(100, 100, 100, 0.2)',
-              'rgba(170, 128, 128, 0.2)',
-              'rgba(200, 130, 150, 0.2)',
-              'rgba(130, 180, 160, 0.2)',
-              'rgba(150, 130, 200, 0.2)',
-            ],
-            borderColor: [
-              'rgb(255, 99, 132)',
-              'rgb(255, 159, 64)',
-              'rgb(255, 205, 86)',
-              'rgb(75, 192, 192)',
-              'rgb(54, 162, 235)',
-              'rgb(153, 102, 255)',
-              'rgb(201, 203, 207)',
-              'rgb(100, 100, 100)',
-              'rgb(170, 128, 128)',
-              'rgb(200, 130, 150)',
-              'rgb(130, 180, 160)',
-              'rgb(150, 130, 200)',
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
+    // Initialize charts based on role
+    initDashboardCharts();
+});
+
+// Workshop search functionality
+function initWorkshopSearch(searchInput) {
+    const workshopCards = document.querySelectorAll('.workshop-card');
+    searchInput.addEventListener('keyup', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        workshopCards.forEach(card => {
+            const searchableElements = {
+                title: card.querySelector('.card-title'),
+                description: card.querySelector('.card-text'),
+                location: card.querySelector('.bi-geo-alt').parentElement
+            };
+            
+            const isVisible = Object.values(searchableElements).some(element => 
+                element.textContent.toLowerCase().includes(searchTerm)
+            );
+            
+            card.closest('.col-lg-4').style.display = isVisible ? '' : 'none';
+        });
     });
-    document.addEventListener('DOMContentLoaded', function() {
-          const searchInput = document.getElementById('searchWorkshop');
-          const workshopCards = document.querySelectorAll('.workshop-card');
+}
 
-          searchInput.addEventListener('keyup', function(e) {
-              const searchTerm = e.target.value.toLowerCase();
+// Dashboard charts initialization
+function initDashboardCharts() {
+    const baseChartConfig = {
+        type: 'bar',
+        options: {
+            scales: { y: { beginAtZero: true } },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    };
 
-              workshopCards.forEach(card => {
-                  const title = card.querySelector('.card-title').textContent.toLowerCase();
-                  const description = card.querySelector('.card-text').textContent.toLowerCase();
-                  const location = card.querySelector('.bi-geo-alt').parentElement.textContent.toLowerCase();
+    // Admin/General participants chart
+    const participantsChart = document.querySelector('#barChart_peserta');
+    if (participantsChart) {
+        new Chart(participantsChart, {
+            ...baseChartConfig,
+            data: {
+                labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                datasets: [{
+                    label: 'Peserta Terdaftar',
+                    data: <?= json_encode($monthlyParticipants ?? []); ?>,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 205, 86, 0.2)', 'rgba(75, 192, 192, 0.2)',
+                        'rgba(54, 162, 235, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                        'rgba(201, 203, 207, 0.2)', 'rgba(100, 100, 100, 0.2)',
+                        'rgba(170, 128, 128, 0.2)', 'rgba(200, 130, 150, 0.2)',
+                        'rgba(130, 180, 160, 0.2)', 'rgba(150, 130, 200, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)', 'rgb(255, 159, 64)',
+                        'rgb(255, 205, 86)', 'rgb(75, 192, 192)',
+                        'rgb(54, 162, 235)', 'rgb(153, 102, 255)',
+                        'rgb(201, 203, 207)', 'rgb(100, 100, 100)',
+                        'rgb(170, 128, 128)', 'rgb(200, 130, 150)',
+                        'rgb(130, 180, 160)', 'rgb(150, 130, 200)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+    }
 
-                  if(title.includes(searchTerm) || description.includes(searchTerm) || location.includes(searchTerm)) {
-                      card.closest('.col-lg-4').style.display = '';
-                  } else {
-                      card.closest('.col-lg-4').style.display = 'none';
-                  }
-              });
-          });
-      });
+    // Mitra participants chart
+    const mitraChart = document.querySelector('#mitraParticipantsChart');
+    if (mitraChart) {
+        new Chart(mitraChart, {
+            ...baseChartConfig,
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Peserta Workshop',
+                    data: <?= json_encode(isset($_SESSION['user_id']) ? getMitraMonthlyParticipants($_SESSION['user_id']) : []); ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            }
+        });
+    }
+}
+</script>
 
-  </script>
 </body>
 
 </html>
