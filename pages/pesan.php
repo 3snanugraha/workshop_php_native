@@ -135,9 +135,17 @@ $contacts = getChatContacts($user_id);
                             <!-- Chat Area -->
                             <div class="col-12 col-lg-8">
                                 <div class="chat-area d-flex flex-column" style="height: 600px;">
-                                    <div class="chat-header px-4 py-3 border-bottom">
-                                        <h5 class="mb-0 brand-color" id="chat-recipient">Select a contact</h5>
+                                <div class="px-4 d-none d-md-block">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <input type="text" class="form-control my-3" id="user-search" 
+                                                placeholder="Search by email or username...">
+                                            <div id="search-results" class="list-group d-none">
+                                                <!-- Search results will appear here -->
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
                                     
                                     <div class="chat-messages p-4 flex-grow-1" style="overflow-y: auto;">
                                         <!-- Messages will be loaded here -->
@@ -196,95 +204,169 @@ $contacts = getChatContacts($user_id);
   <script src="assets/js/main.js"></script>
   <script src="assets/js/autohide.js"></script>
 
-  <!-- Chat fungsi -->
+<!-- Chat fungsi -->
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements with null checks
+    const elements = {
+        userSearch: document.getElementById('user-search'),
+        searchResults: document.getElementById('search-results'),
+        contactItems: document.querySelectorAll('.contact-item'),
+        messageInput: document.getElementById('message-input'),
+        sendButton: document.getElementById('send-message'),
+        chatMessages: document.querySelector('.chat-messages'),
+        chatRecipient: document.getElementById('chat-recipient')
+    };
+
     let currentReceiverId = null;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const contactItems = document.querySelectorAll('.contact-item');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-message');
-        const chatMessages = document.querySelector('.chat-messages');
-        
-        contactItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const userId = this.dataset.userId;
-                const userName = this.querySelector('h5').textContent;
-                
-                // Update header with selected contact name
-                document.getElementById('chat-recipient').textContent = userName;
-                
-                loadChatHistory(userId);
-                currentReceiverId = userId;
-                
-                // Update active state
-                contactItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
+    // Initialize Contact List Events
+    elements.contactItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            initializeChat(this.dataset.userId, this.querySelector('h5').textContent);
+            elements.contactItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
         });
-        
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', function(e) {
+    });
+
+    // Initialize Message Input Events
+    if (elements.sendButton) {
+        elements.sendButton.addEventListener('click', sendMessage);
+    }
+    
+    if (elements.messageInput) {
+        elements.messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-        
-        function loadChatHistory(receiverId) {
-            fetch(`../controllers/get_chat_history.php?receiver_id=${receiverId}`)
-                .then(response => response.json())
-                .then(data => {
-                    chatMessages.innerHTML = '';
-                    data.forEach(message => {
-                        const isOwn = message.sender_id == <?= $user_id ?>;
-                        const messageHtml = `
-                            <div class="chat-message ${isOwn ? 'own-message text-end' : 'other-message'}">
-                                <div class="message-bubble d-inline-block p-2 mb-2 rounded">
-                                    <div class="message-text">${message.message}</div>
-                                    <small class="text-muted">${message.sent_at}</small>
-                                </div>
-                            </div>
-                        `;
-                        chatMessages.insertAdjacentHTML('beforeend', messageHtml);
-                    });
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                });
+    }
+
+    // Initialize Search Functionality
+    if (elements.userSearch) {
+        elements.userSearch.addEventListener('input', debounce(function() {
+            const searchTerm = this.value.trim();
+            if (searchTerm.length < 2) {
+                elements.searchResults.classList.add('d-none');
+                return;
+            }
+            performSearch(searchTerm);
+        }, 300));
+    }
+
+    if (elements.searchResults) {
+        elements.searchResults.addEventListener('click', function(e) {
+            const resultItem = e.target.closest('.search-result');
+            if (!resultItem) return;
+            
+            e.preventDefault();
+            initializeChat(resultItem.dataset.userId, resultItem.dataset.userName);
+            elements.searchResults.classList.add('d-none');
+            elements.userSearch.value = '';
+        });
+    }
+
+    function initializeChat(userId, userName) {
+        if (!userId) return;
+        currentReceiverId = userId;
+        if (elements.chatRecipient) {
+            elements.chatRecipient.textContent = userName || 'Chat';
         }
-        
-        function sendMessage() {
-            if (!currentReceiverId) return;
-            
-            const message = messageInput.value.trim();
-            if (!message) return;
-            
-            fetch('../controllers/send_message.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    receiver_id: currentReceiverId,
-                    message: message
-                })
-            })
+        loadChatHistory(userId);
+    }
+
+    function loadChatHistory(receiverId) {
+        if (!elements.chatMessages) return;
+
+        fetch(`../controllers/get_chat_history.php?receiver_id=${receiverId}`)
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    messageInput.value = '';
-                    loadChatHistory(currentReceiverId);
-                }
+                elements.chatMessages.innerHTML = '';
+                data.forEach(message => {
+                    const isOwn = message.sender_id == <?= $user_id ?>;
+                    const messageHtml = `
+                        <div class="chat-message ${isOwn ? 'own-message text-end' : 'other-message'}">
+                            <div class="message-bubble d-inline-block p-2 mb-2 rounded">
+                                <div class="message-text">${message.message}</div>
+                                <small class="text-muted">${message.sent_at}</small>
+                            </div>
+                        </div>
+                    `;
+                    elements.chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+                });
+                elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
             });
-        }
+    }
+
+    function sendMessage() {
+        if (!currentReceiverId || !elements.messageInput) return;
         
-        // Auto refresh chat every 5 seconds
-        setInterval(() => {
-            if (currentReceiverId) {
+        const message = elements.messageInput.value.trim();
+        if (!message) return;
+
+        fetch('../controllers/send_messages.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                receiver_id: currentReceiverId,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                elements.messageInput.value = '';
                 loadChatHistory(currentReceiverId);
             }
-        }, 5000);
-    });
+        });
+    }
+
+    function performSearch(searchTerm) {
+        fetch(`../controllers/search_users.php?term=${searchTerm}`)
+            .then(response => response.json())
+            .then(users => {
+                if (!elements.searchResults) return;
+                
+                elements.searchResults.innerHTML = users.map(user => `
+                    <a href="#" class="list-group-item list-group-item-action search-result"
+                       data-user-id="${user.user_id}"
+                       data-user-name="${user.first_name} ${user.last_name}">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">${user.first_name} ${user.last_name}</h6>
+                            <small>${user.username}</small>
+                        </div>
+                        <small>${user.email}</small>
+                    </a>
+                `).join('');
+                elements.searchResults.classList.remove('d-none');
+            });
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func.apply(this, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Auto refresh chat
+    setInterval(() => {
+        if (currentReceiverId) {
+            loadChatHistory(currentReceiverId);
+        }
+    }, 5000);
+});
 </script>
+
+
 
 
 </body>

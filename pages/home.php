@@ -56,11 +56,10 @@ ini_set('display_errors', 1);
           <?php if($isLogin) { ?>
           <li class="dropdown"><a href="#"><span>Akun</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="#">Profil Saya</a></li>
-              <li><a href="#">Workshop Saya</a></li>
-              <li><a href="#">Riwayat Transaksi</a></li>
-              <li><a href="#">Pengaturan</a></li>
-              <li><a href="#">Keluar</a></li>
+              <li><a href="dashboard.php">Profil Saya</a></li>
+              <li><a href="data-pembayaran.php">Workshop Saya</a></li>
+              <li><a href="data-pembayaran.php">Riwayat Transaksi</a></li>
+              <li><a href="pesan.php">Pesan</a></li>
             </ul>
           </li>
           <?php } ?>
@@ -74,7 +73,8 @@ ini_set('display_errors', 1);
       <?php } ?>
 
     </div>
-  </header>  <main class="main">
+  </header>  
+  <main class="main">
 
     <!-- Hero Section -->
     <section id="hero" class="hero section">

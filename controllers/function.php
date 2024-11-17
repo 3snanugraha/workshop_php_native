@@ -860,5 +860,20 @@ function markMessagesAsRead($sender_id, $receiver_id) {
     return $stmt->execute();
 }
 
+function searchUsers($search_term) {
+    require '../databases/database.php';
+    $sql = "SELECT user_id, username, email, first_name, last_name 
+            FROM users 
+            WHERE (email LIKE ? OR username LIKE ?) 
+            AND user_id != ?
+            LIMIT 5";
+            
+    $search_term = "%$search_term%";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssi", $search_term, $search_term, $_SESSION['user_id']);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
 
 ?>
