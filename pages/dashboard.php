@@ -295,7 +295,7 @@ $workshops = getAllWorkshops();
                               <i class="bi bi-calendar-event"></i> <?= date('d M Y', strtotime($workshop['start_date'])) ?>
                           </div>
                           <div class="mb-2">
-                              <i class="bi bi-currency-dollar"></i> Rp <?= number_format($workshop['price'], 0, ',', '.') ?>
+                              <b><i class="bi bi-cash"></i> Rp <?= number_format($workshop['price'], 0, ',', '.') ?></b>
                           </div>
                       </div>
                   </div>

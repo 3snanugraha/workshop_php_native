@@ -545,24 +545,39 @@ function handlePaymentUpload($file, $registration_id) {
     $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
     $max_size = 2 * 1024 * 1024; // 2MB
     
-    if(!in_array($file['type'], $allowed_types)) {
+    // Check upload directory
+    $upload_dir = "../pages/assets/img/payment/";
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    // Validate file
+    if (!in_array($file['type'], $allowed_types)) {
         return ['status' => false, 'message' => 'Format file harus JPG/PNG'];
     }
     
-    if($file['size'] > $max_size) {
+    if ($file['size'] > $max_size) {
         return ['status' => false, 'message' => 'Ukuran file maksimal 2MB'];
     }
     
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = "INV-" . $registration_id . "." . $ext;
-    $upload_path = "../pages/assets/img/payment/" . $filename;
+    $upload_path = $upload_dir . $filename;
     
-    if(move_uploaded_file($file['tmp_name'], $upload_path)) {
+    // Check if directory is writable
+    if (!is_writable($upload_dir)) {
+        return ['status' => false, 'message' => 'Directory tidak dapat ditulis'];
+    }
+    
+    if (move_uploaded_file($file['tmp_name'], $upload_path)) {
         return ['status' => true, 'filename' => $filename];
     }
     
+    // Log error if upload fails
+    error_log("Upload failed for file: " . $file['name'] . " to path: " . $upload_path);
     return ['status' => false, 'message' => 'Gagal mengupload file'];
 }
+
 
 // Create payment record
 function createPaymentRecord($registration_id, $amount, $payment_receipt, $bank_id) {
