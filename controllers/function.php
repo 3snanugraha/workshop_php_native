@@ -392,6 +392,16 @@ function checkInputAuth() {
     return $auth;
 }
 
+// Validasi auth untuk input, update, dll
+function checkMitraAuth() {
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'mitra') {
+        $auth=false;
+    }else{
+        $auth=true;
+    }
+    return $auth;
+}
+
 // Validasi ketika di halaman login
 function checkAuthorized(){
     session_start();
@@ -460,6 +470,26 @@ function getWorkshopById($workshop_id) {
     return $result->fetch_assoc();
 }
 
+// Get Workshop By Mitra ID
+function getWorkshopByMitraId($mitra_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT w.*, CONCAT(u.first_name, ' ', u.last_name) as mitra_name 
+            FROM workshops w 
+            LEFT JOIN users u ON w.mitra_id = u.user_id 
+            WHERE w.mitra_id = ?
+            ORDER BY w.created_at DESC";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $mitra_id);
+    $stmt->execute();
+    
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+
+// Update Function
 function updateWorkshop($workshop_id, $title, $description, $banner, $training_overview, 
                        $trained_competencies, $training_session, $requirements, $benefits, 
                        $price, $location, $start_date, $end_date, $status) {
@@ -486,6 +516,23 @@ function updateWorkshop($workshop_id, $title, $description, $banner, $training_o
 function deleteWorkshop($workshop_id) {
     global $conn;
     
+    // First get the banner filename to delete the image file
+    $sql = "SELECT banner FROM workshops WHERE workshop_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $workshop_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $workshop = $result->fetch_assoc();
+    
+    // Delete the banner image if it exists
+    if($workshop && $workshop['banner'] != 'sample.jpg') {
+        $banner_path = "../pages/assets/img/workshop/" . $workshop['banner'];
+        if(file_exists($banner_path)) {
+            unlink($banner_path);
+        }
+    }
+    
+    // Delete the workshop record
     $sql = "DELETE FROM workshops WHERE workshop_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $workshop_id);
@@ -495,6 +542,7 @@ function deleteWorkshop($workshop_id) {
     }
     return "Gagal menghapus workshop: " . $stmt->error;
 }
+
 
 // ====================================================================
 //  PAYMENT FUNCTION

@@ -74,7 +74,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bayar'])) {
     exit();
 }
 
+// Handler for deleting workshop
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteWorkshop'])) {
+    $auth = checkMitraAuth();
+    if (!$auth) {
+        echo "<script>alert('You are not authorized for this operation.');window.location='../pages/index.php';</script>";
+        exit();
+    } else {
+        require $db_path;
 
+        $workshop_id = mysqli_real_escape_string($conn, $_GET['deleteWorkshop']);
+        $deleteResult = deleteWorkshop($workshop_id);
+        
+        if ($deleteResult === "Workshop berhasil dihapus.") {
+            echo "<script>alert('$deleteResult');</script>";
+        } else {
+            echo "<script>alert('$deleteResult');</script>";
+        }
+        echo "<script>window.location.href='../pages/data-workshop.php';</script>";    
+        exit;
+    }
+}
 
 // Menangani request untuk login
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
@@ -275,8 +295,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateMitra'])) {
         }
     }
 }
-
-
 
 // Menangani request untuk menghapus pengguna (Delete)
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteUser'])) {
