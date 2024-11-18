@@ -10,6 +10,29 @@ $db_path='../databases/database.php';
 $fe_path='../pages/';
 
 
+
+
+// Payment verification handler
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verifyPayment'])) {
+    require $db_path;
+    
+    $payment_id = filter_input(INPUT_POST, 'payment_id', FILTER_VALIDATE_INT);
+    
+    if($payment_id) {
+        $sql = "UPDATE payments SET payment_status = 'successful' WHERE payment_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $payment_id);
+        
+        if($stmt->execute()) {
+            echo "success";
+        } else {
+            http_response_code(500);
+            echo "error";
+        }
+    }
+    exit();
+}
+
 // Workshop Payment Processing
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bayar'])) {
     require $db_path;

@@ -5,6 +5,30 @@
 // error_reporting(E_ALL);
 
 
+// Fungsi Umum
+function getNotifications($user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT 
+            p.payment_status,
+            p.payment_date,
+            w.title as workshop_title,
+            CONCAT(u.first_name, ' ', u.last_name) as user_name,
+            TIMESTAMPDIFF(MINUTE, p.payment_date, NOW()) as minutes_ago
+        FROM payments p
+        JOIN registrations r ON p.registration_id = r.registration_id
+        JOIN workshops w ON r.workshop_id = w.workshop_id
+        JOIN users u ON r.user_id = u.user_id
+        WHERE p.payment_status = 'pending'
+        ORDER BY p.payment_date DESC
+        LIMIT 5";
+        
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
 // Fungsi Create - Menambahkan pengguna baru
 function createUser($first_name, $last_name, $username, $password, $email, $role, $phone) {
     global $conn;
@@ -302,6 +326,33 @@ function getFinancialData() {
     } else {
         return [];
     }
+}
+
+// Data Keuangan Admin
+function getFinancialDataAdmin() {
+    require '../databases/database.php';
+    
+    $sql = "SELECT 
+            r.registration_id,
+            CONCAT(u.first_name, ' ', u.last_name) as nama_peserta,
+            w.title as nama_workshop,
+            p.amount,
+            p.payment_method,
+            p.payment_status,
+            p.payment_date,
+            p.payment_receipt,
+            p.payment_id,
+            CONCAT(m.first_name, ' ', m.last_name) as nama_mitra
+            FROM registrations r
+            LEFT JOIN payments p ON r.registration_id = p.registration_id
+            LEFT JOIN users u ON r.user_id = u.user_id
+            LEFT JOIN workshops w ON r.workshop_id = w.workshop_id
+            LEFT JOIN users m ON w.mitra_id = m.user_id
+            WHERE p.payment_id IS NOT NULL
+            ORDER BY p.payment_date DESC";
+
+    $result = $conn->query($sql);
+    return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
 // // Fungsi untuk menghitung total penghasilan

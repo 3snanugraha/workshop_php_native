@@ -1,6 +1,8 @@
 <?php
 require '../controllers/function.php';
 checkAuth();
+$data = getFinancialDataAdmin();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +60,7 @@ checkAuth();
     </div><!-- End Page Title -->
 
     <?php require 'alert.php'; ?>
-<section class="section dashboard">
+    <section class="section dashboard">
       <div class="row">
 
         <!-- Left side columns -->
@@ -116,35 +118,96 @@ checkAuth();
               
               <!-- Fetch Data Keuangan dari db -->
               <div class="table-responsive">
-                <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
-                <thead>
-                  <tr>
-                    <th>Nama Workshop</th>
-                    <th>Nama Mitra</th>
-                    <th>Nama Pendaftar</th>
-                    <th>Status Bayar</th>
-                    <th>Metode Bayar</th>
-                    <th>Harga</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  $data = getFinancialData();
-                  foreach($data as $datas) {
-                  
-                    ?>
+              <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
+                  <thead>
                     <tr>
-                      <td><?= $datas['nama_workshop'] ?></td>
-                      <td><?= $datas['nama_mitra'] ?></td>
-                      <td><?= $datas['nama_peserta'] ?></td>
-                      <td><?= $datas['status_pembayaran'] ?></td>
-                      <td><?= $datas['metode_pembayaran'] ?></td>
-                      <td><?= "Rp. " . number_format($datas['harga_workshop']) ?></td>
+                      <th>No</th>
+                      <th>Nama Workshop</th>
+                      <th>Nama Mitra</th>
+                      <th>Nama Pendaftar</th>
+                      <th>Status Bayar</th>
+                      <th>Metode Bayar</th>
+                      <th>Tanggal Bayar</th>
+                      <th>Harga</th>
+                      <th>Aksi</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                    $no = 1;
+                    foreach($data as $datas) {
+                    ?>
+                      <tr>
+                        <td><?= $no++ ?></td>
+                        <td><?= $datas['nama_workshop'] ?></td>
+                        <td><?= $datas['nama_mitra'] ?></td>
+                        <td><?= $datas['nama_peserta'] ?></td>
+                        <td>
+                          <?php if($datas['payment_status'] == 'pending'): ?>
+                            <span class="badge bg-warning">Pending</span>
+                          <?php elseif($datas['payment_status'] == 'successful'): ?>
+                            <span class="badge bg-success">Sukses</span>
+                          <?php else: ?>
+                            <span class="badge bg-danger">Gagal</span>
+                          <?php endif; ?>
+                        </td>
+                        <td><?= $datas['payment_method'] ?></td>
+                        <td><?= date('d/m/Y H:i', strtotime($datas['payment_date'])) ?></td>
+                        <td>Rp. <?= number_format($datas['amount'], 0, ',', '.') ?></td>
+                        <td>
+                          <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal<?= $datas['payment_id'] ?>">
+                            <i class="bi bi-eye"></i>
+                          </button>
+                          <?php if($datas['payment_status'] != 'successful'): ?>
+                          <button class="btn btn-sm btn-success verifyBtn" data-id="<?= $datas['payment_id'] ?>">
+                            <i class="bi bi-check-circle"></i>
+                          </button>
+                          <?php endif; ?>
+                        </td>
+                      </tr>
 
-                  <?php } ?>
-                </tbody>
+                      <!-- Detail Modal -->
+                      <div class="modal fade" id="detailModal<?= $datas['payment_id'] ?>" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">Detail Transaksi</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="row mb-3">
+                                <div class="col-12">
+                                  <img src="assets/img/payment/<?= $datas['payment_receipt'] ?>" class="img-fluid" alt="Bukti Transfer">
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-6"><strong>Workshop:</strong></div>
+                                <div class="col-6"><?= $datas['nama_workshop'] ?></div>
+                              </div>
+                              <div class="row">
+                                <div class="col-6"><strong>Peserta:</strong></div>
+                                <div class="col-6"><?= $datas['nama_peserta'] ?></div>
+                              </div>
+                              <div class="row">
+                                <div class="col-6"><strong>Jumlah:</strong></div>
+                                <div class="col-6">Rp. <?= number_format($datas['amount']) ?></div>
+                              </div>
+                              <div class="row">
+                                <div class="col-6"><strong>Tanggal:</strong></div>
+                                <div class="col-6"><?= $datas['payment_date'] ?></div>
+                              </div>
+                              <div class="row">
+                                <div class="col-6"><strong>Status:</strong></div>
+                                <div class="col-6"><?= $datas['payment_status'] ?></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    <?php } ?>
+                  </tbody>
                 </table>
+
               </div>
 
             </div>
@@ -237,6 +300,29 @@ checkAuth();
         order: [[0, 'asc']],
         drawCallback: function() {
           $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+        }
+      });
+    });
+
+    $(document).ready(function() {
+      $('.verifyBtn').click(function() {
+        let paymentId = $(this).data('id');
+        if(confirm('Verifikasi pembayaran ini?')) {
+          $.ajax({
+            url: '../controllers/controller.php',
+            type: 'POST',
+            data: {
+              verifyPayment: true,
+              payment_id: paymentId
+            },
+            success: function(response) {
+              alert('Pembayaran berhasil diverifikasi');
+              location.reload();
+            },
+            error: function() {
+              alert('Terjadi kesalahan');
+            }
+          });
         }
       });
     });
