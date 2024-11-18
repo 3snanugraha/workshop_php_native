@@ -6,6 +6,7 @@ if(!$data){
   header('Location: dashboard.php');
 }
 checkAuth();
+$role = $_SESSION['role'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,8 +63,9 @@ checkAuth();
       </nav>
     </div><!-- End Page Title -->
 
-      <?php require 'alert.php'; ?>
-<section class="section dashboard">
+    <?php require 'alert.php'; ?>
+    <section class="section dashboard">
+    <?php if($role!='admin' && $role!='mitra'){ ?>
         <div class="row">
           <!-- Full side columns -->
           <div class="col-lg-12">
@@ -206,9 +208,9 @@ checkAuth();
                                           <button class="btn brand-btn rounded-pill btn-lg" type="button" onclick="nextStep()">
                                               <i class="bi bi-cart-fill"></i> Beli Sekarang
                                           </button>
-                                          <button class="btn btn-outline-info rounded-pill btn-lg" type="button">
+                                          <a href="pesan.php?mitra_id=<?= $data['mitra_id'] ?>&workshop_title=<?= urlencode($data['title']) ?>" class="btn btn-outline-info rounded-pill btn-lg" type="button">
                                               <i class="bi bi-chat-text-fill"></i> Tanya Informasi
-                                          </button>
+                                      </a>
                                       <?php else: ?>
                                           <button class="btn btn-secondary btn-lg" type="button" disabled>
                                               <i class="bi bi-x-circle"></i> Workshop Tidak Tersedia
@@ -333,6 +335,15 @@ checkAuth();
             </div>
           </div>
         </div>
+    <?php }else{
+      echo "
+      <div class='row text-center mt-5 mb-5'>
+        <div class='col-12 mt-5 mb-5'>
+            <h1 class='text-center mt-5 mb-5'> Mohon maaf, halaman ini hanya dapat diakses oleh peserta </h1>
+        </div>
+      </div>
+      ";
+    } ?>
       </section>
 
       <script>

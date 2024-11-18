@@ -34,7 +34,36 @@ ini_set('display_errors', 1);
 
   <!-- Main CSS File -->
   <link href="landingpage/assets/css/main.css" rel="stylesheet">
+  <style>
+    .workshop-reviews {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+    }
 
+    .average-rating {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .review-item {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    .reviewer-info {
+      display: flex;
+      align-items: center;
+      color: #666;
+    }
+
+    .review-text {
+      font-style: italic;
+      color: #444;
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -53,12 +82,14 @@ ini_set('display_errors', 1);
           <li><a href="#hero" class="active">Beranda</a></li>
           <li><a href="#about">Tentang</a></li>
           <li><a href="#workshops">Workshop</a></li>
-          <?php if($isLogin) { ?>
+          <?php if($isLogin) { $role = $_SESSION['role']; ?>
           <li class="dropdown"><a href="#"><span>Akun</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="dashboard.php">Profil Saya</a></li>
+              <?php if($role != 'admin' && $role != 'mitra') { ?>
               <li><a href="data-pembayaran.php">Workshop Saya</a></li>
               <li><a href="data-pembayaran.php">Riwayat Transaksi</a></li>
+              <?php } ?>              
               <li><a href="pesan.php">Pesan</a></li>
             </ul>
           </li>
@@ -276,18 +307,13 @@ ini_set('display_errors', 1);
           <div class="col-lg-8">
             <div class="search-wrapper glass-effect" data-aos="zoom-in">
               <div class="input-group">
-                <input type="text" class="form-control search-input" placeholder="Temukan workshop impianmu..." id="workshopSearch">
-                <select class="form-select custom-select" style="max-width: 180px;">
-                  <option selected>Pilih Kategori</option>
-                  <option>Digital Marketing</option>
-                  <option>Leadership</option>
-                  <option>Data Science</option>
-                  <option>UI/UX Design</option>
-                  <option>Business Strategy</option>
-                </select>
-                <button class="btn btn-primary" type="button">
-                  <i class="bi bi-search"></i> Explore
-                </button>
+              <input 
+                type="text" 
+                class="form-control search-input rounded-pill" 
+                placeholder="Temukan workshop impianmu..." 
+                id="workshopSearch" 
+                autocomplete="off"
+               />
               </div>
             </div>
           </div>
@@ -303,13 +329,7 @@ ini_set('display_errors', 1);
                 <i class="bi bi-grid"></i> Semua
               </button>
               <button class="btn btn-pill">
-                <i class="bi bi-star"></i> Trending
-              </button>
-              <button class="btn btn-pill">
                 <i class="bi bi-clock"></i> Terbaru
-              </button>
-              <button class="btn btn-pill">
-                <i class="bi bi-calendar-event"></i> Upcoming
               </button>
               <button class="btn btn-pill">
                 <i class="bi bi-trophy"></i> Best Seller
@@ -321,133 +341,251 @@ ini_set('display_errors', 1);
         <div class="row gy-4">
           <!-- Workshop Cards with Enhanced Design -->
           <?php foreach ($workshops as $workshop): ?>
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="card workshop-card hover-effect">
-              <div class="card-badge">
-                <span class="badge <?= $workshop['status'] === 'active' ? 'bg-success' : 'bg-danger' ?>">
-                  <?= $workshop['status'] === 'active' ? 'Masih dibuka' : 'Ditutup' ?>
-                </span>
-              </div>
-              <div class="card-image-wrapper">
-                <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="card-img-top" alt="<?= htmlspecialchars($workshop['title']) ?>">
-                <div class="overlay">
-                  <div class="overlay-content">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+              <div class="card workshop-card hover-effect">
+                  <div class="card-badge">
+                      <span class="badge <?= $workshop['status'] === 'active' ? 'bg-success' : 'bg-danger' ?>">
+                          <?= $workshop['status'] === 'active' ? 'Masih dibuka' : 'Ditutup' ?>
+                      </span>
+                  </div>
+                  <div class="card-image-wrapper">
+                      <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="card-img-top" alt="<?= htmlspecialchars($workshop['title']) ?>">
+                      <div class="overlay">
+                          <div class="overlay-content"></div>
+                      </div>
+                  </div>
 
+                    <!-- Add this rating section after card-image-wrapper -->
+                    <div class="rating-wrapper mt-2 mb-2 d-flex align-items-center justify-content-between">
+                        <div class="rating-stars">
+                            <?php
+                            $rating = round($workshop['average_rating']);
+                            for ($i = 1; $i <= 5; $i++) {
+                                if ($i <= $rating) {
+                                    echo '<i class="bi bi-star-fill text-warning"></i>';
+                                } else {
+                                    echo '<i class="bi bi-star text-muted"></i>';
+                                }
+                            }
+                            ?>
+                            <span class="ms-2 text-muted">
+                                <?= number_format($workshop['average_rating'], 1) ?> 
+                                (<?= $workshop['total_reviews'] ?> ulasan)
+                            </span>
+                        </div>
+                        <span class="participants-count">
+                            <i class="bi bi-people-fill text-primary"></i> 
+                            <?= $workshop['total_participants'] ?> peserta
+                        </span>
+                    </div>                  
+                
+                  <div class="card-body">
+                      <div class="category-badge">
+                          <span class="badge bg-soft-primary"><?= htmlspecialchars($workshop['category']) ?></span>
+                      </div>
+                      <h3 class="card-title h5"><?= htmlspecialchars($workshop['title']) ?></h3>
+                      <p class="card-text text-muted"><?= htmlspecialchars(substr($workshop['description'], 0, 120)) ?>...</p>
+                      <div class="workshop-info">
+                          <div class="info-item">
+                              <i class="bi bi-calendar-event"></i>
+                              <span><?= date('d M Y', strtotime($workshop['start_date'])) ?></span>
+                          </div>
+                          <div class="info-item">
+                              <i class="bi bi-geo-alt"></i>
+                              <span><?= $workshop['location'] ?></span>
+                          </div>
+                          <div class="info-item">
+                              <i class="bi bi-tag"></i>
+                              <span>Rp <?= number_format($workshop['price'], 0, ',', '.') ?></span>
+                          </div>
+                      </div>
+                      <div class="action-buttons mt-3 text-center">
+                          <button class="btn btn-outline-primary rounded-pill animate-pulse" data-bs-toggle="modal" data-bs-target="#workshopModal<?= $workshop['workshop_id'] ?>" onmouseover="this.classList.add('btn-glow')" onmouseout="this.classList.remove('btn-glow')">
+                              <i class="bi bi-eye me-2"></i>Lihat Workshop
+                          </button>
+                      </div>
                   </div>
-                </div>
               </div>
-              <div class="card-body">
-                <div class="category-badge">
-                  <span class="badge bg-soft-primary"><?= htmlspecialchars($workshop['category']) ?></span>
-                </div>
-                <h3 class="card-title h5"><?= htmlspecialchars($workshop['title']) ?></h3>
-                <p class="card-text text-muted"><?= htmlspecialchars(substr($workshop['description'], 0, 120)) ?>...</p>
-                <div class="workshop-info">
-                  <div class="info-item">
-                    <i class="bi bi-calendar-event"></i>
-                    <span><?= date('d M Y', strtotime($workshop['start_date'])) ?></span>
-                  </div>
-                  <div class="info-item">
-                    <i class="bi bi-geo-alt"></i>
-                    <span><?= $workshop['location'] ?></span>
-                  </div>
-                  <div class="info-item">
-                    <i class="bi bi-tag"></i>
-                    <span>Rp <?= number_format($workshop['price'], 0, ',', '.') ?></span>
-                  </div>
-                </div>
-                <div class="action-buttons mt-3">
-                  <button class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#workshopModal<?= $workshop['workshop_id'] ?>">
-                    <i class="bi bi-info-circle me-2"></i>Detail Workshop
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- Enhanced Workshop Modal -->
           <div class="modal fade" id="workshopModal<?= $workshop['workshop_id'] ?>" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header gradient-bg">
-                  <h5 class="modal-title text-white"><?= htmlspecialchars($workshop['title']) ?></h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <div class="modal-content rounded-4 shadow-lg">
+                <div class="modal-header gradient-bg border-0 rounded-top-4">
+                  <h5 class="modal-title"><i class="bi bi-mortarboard-fill me-2"></i><?= htmlspecialchars($workshop['title']) ?></h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                  <div class="row">
+                <div class="modal-body p-4">
+                  <div class="row g-4">
                     <div class="col-md-6">
-                      <div class="workshop-image-wrapper">
-                        <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($workshop['title']) ?>">
-                        <div class="workshop-highlights">
-                          <div class="highlight-item">
-                            <i class="bi bi-people-fill"></i>
-                            <span>30 Peserta</span>
-                          </div>
-                          <div class="highlight-item">
-                            <i class="bi bi-clock-fill"></i>
-                            <span>24 Jam</span>
+                      <div class="workshop-image-wrapper position-relative overflow-hidden rounded-4 shadow">
+                        <img src="assets/img/workshops/<?= htmlspecialchars($workshop['banner']) ?>" class="img-fluid w-100" alt="<?= htmlspecialchars($workshop['title']) ?>">
+                        <div class="workshop-highlights position-absolute bottom-0 start-0 end-0 p-3 bg-dark bg-opacity-75 text-white">
+                          <div class="d-flex justify-content-around">
+                            <div class="highlight-item text-center">
+                              <i class="bi bi-people-fill fs-4"></i>
+                              <div class="mt-2">30 Peserta</div>
+                            </div>
+                            <div class="highlight-item text-center">
+                              <i class="bi bi-clock-fill fs-4"></i>
+                              <div class="mt-2">24 Jam</div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="col-md-6">
-                      <div class="workshop-details">
-                        <div class="detail-item">
-                          <i class="bi bi-calendar-check-fill"></i>
+                      <div class="workshop-details bg-light p-4 rounded-4">
+                        <div class="detail-item d-flex align-items-center mb-4">
+                          <div class="icon-wrapper bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="bi bi-calendar-check-fill text-primary fs-4"></i>
+                          </div>
                           <div>
-                            <strong>Jadwal</strong>
-                            <p>Mulai: <?= date('d M Y H:i', strtotime($workshop['start_date'])) ?><br>
-                               Selesai: <?= date('d M Y H:i', strtotime($workshop['end_date'])) ?></p>
+                            <h6 class="mb-2">Jadwal</h6>
+                            <p class="mb-0 text-muted">
+                              Mulai: <?= date('d M Y H:i', strtotime($workshop['start_date'])) ?><br>
+                              Selesai: <?= date('d M Y H:i', strtotime($workshop['end_date'])) ?>
+                            </p>
                           </div>
                         </div>
-                        <div class="detail-item">
-                          <i class="bi bi-geo-alt-fill"></i>
+                        <div class="detail-item d-flex align-items-center mb-4">
+                          <div class="icon-wrapper bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="bi bi-geo-alt-fill text-success fs-4"></i>
+                          </div>
                           <div>
-                            <strong>Lokasi</strong>
-                            <p><?= htmlspecialchars($workshop['location']) ?></p>
+                            <h6 class="mb-2">Lokasi</h6>
+                            <p class="mb-0 text-muted"><?= htmlspecialchars($workshop['location']) ?></p>
                           </div>
                         </div>
-                        <div class="detail-item">
-                          <i class="bi bi-tag-fill"></i>
+                        <div class="detail-item d-flex align-items-center">
+                          <div class="icon-wrapper bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="bi bi-tag-fill text-warning fs-4"></i>
+                          </div>
                           <div>
-                            <strong>Investasi</strong>
-                            <p>Rp <?= number_format($workshop['price'], 0, ',', '.') ?></p>
+                            <h6 class="mb-2">Investasi</h6>
+                            <p class="mb-0 text-muted">Rp <?= number_format($workshop['price'], 0, ',', '.') ?></p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="workshop-content mt-4">
-                    <div class="content-section">
-                      <h5><i class="bi bi-book me-2"></i>Overview Pelatihan</h5>
-                      <p><?= nl2br(htmlspecialchars($workshop['training_overview'])) ?></p>
+
+                  <div class="workshop-content mt-5">
+                    <div class="content-section mb-4 p-4 bg-light rounded-4">
+                      <h5 class="d-flex align-items-center">
+                        <span class="icon-wrapper bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                          <i class="bi bi-book text-primary"></i>
+                        </span>
+                        Overview Pelatihan
+                      </h5>
+                      <p class="mb-0"><?= nl2br(htmlspecialchars($workshop['training_overview'])) ?></p>
                     </div>
-                    <div class="content-section">
-                      <h5><i class="bi bi-trophy me-2"></i>Kompetensi yang Dilatih</h5>
-                      <p><?= nl2br(htmlspecialchars($workshop['trained_competencies'])) ?></p>
+                    <div class="content-section mb-4 p-4 bg-light rounded-4">
+                      <h5 class="d-flex align-items-center">
+                        <span class="icon-wrapper bg-success bg-opacity-10 p-2 rounded-circle me-3">
+                          <i class="bi bi-trophy text-success"></i>
+                        </span>
+                        Kompetensi yang Dilatih
+                      </h5>
+                      <p class="mb-0"><?= nl2br(htmlspecialchars($workshop['trained_competencies'])) ?></p>
                     </div>
-                    <div class="content-section">
-                      <h5><i class="bi bi-calendar3 me-2"></i>Sesi Pelatihan</h5>
-                      <p><?= nl2br(htmlspecialchars($workshop['training_session'])) ?></p>
+                    <div class="content-section mb-4 p-4 bg-light rounded-4">
+                      <h5 class="d-flex align-items-center">
+                        <span class="icon-wrapper bg-info bg-opacity-10 p-2 rounded-circle me-3">
+                          <i class="bi bi-calendar3 text-info"></i>
+                        </span>
+                        Sesi Pelatihan
+                      </h5>
+                      <p class="mb-0"><?= nl2br(htmlspecialchars($workshop['training_session'])) ?></p>
                     </div>
-                    <div class="content-section">
-                      <h5><i class="bi bi-check-circle me-2"></i>Persyaratan</h5>
-                      <p><?= nl2br(htmlspecialchars($workshop['requirements'])) ?></p>
+                    <div class="content-section mb-4 p-4 bg-light rounded-4">
+                      <h5 class="d-flex align-items-center">
+                        <span class="icon-wrapper bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+                          <i class="bi bi-check-circle text-warning"></i>
+                        </span>
+                        Persyaratan
+                      </h5>
+                      <p class="mb-0"><?= nl2br(htmlspecialchars($workshop['requirements'])) ?></p>
                     </div>
-                    <div class="content-section">
-                      <h5><i class="bi bi-gift me-2"></i>Manfaat</h5>
-                      <p><?= nl2br(htmlspecialchars($workshop['benefits'])) ?></p>
+                    <div class="content-section mb-4 p-4 bg-light rounded-4">
+                      <h5 class="d-flex align-items-center">
+                        <span class="icon-wrapper bg-danger bg-opacity-10 p-2 rounded-circle me-3">
+                          <i class="bi bi-gift text-danger"></i>
+                        </span>
+                        Manfaat
+                      </h5>
+                      <p class="mb-0"><?= nl2br(htmlspecialchars($workshop['benefits'])) ?></p>
+                    </div>
+                  </div>
+
+                  <div class="workshop-reviews mt-5">
+                    <h5 class="mb-4 ">
+                      <span class="icon-wrapper bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+                        <i class="bi bi-star text-warning"></i>
+                      </span>
+                      Ulasan Workshop
+                    </h5>
+                    
+                    <div class="rating-summary bg-light p-4 rounded-4 mb-4">
+                      <div class="row align-items-center">
+                        <div class="col-md-6 text-center">
+                          <h2 class="display-4 fw-bold text-primary"><?= number_format($workshop['average_rating'], 1) ?></h2>
+                          <p class="text-muted mb-2">dari 5.0</p>
+                          <div class="stars">
+                            <?php
+                            $rating = round($workshop['average_rating']);
+                            for ($i = 1; $i <= 5; $i++) {
+                              echo $i <= $rating ? 
+                                '<i class="bi bi-star-fill text-warning fs-4"></i>' : 
+                                '<i class="bi bi-star text-muted fs-4"></i>';
+                            }
+                            ?>
+                          </div>
+                          <p class="mt-2 text-muted"><?= $workshop['total_reviews'] ?> ulasan</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="reviews-list">
+                      <?php 
+                      if ($workshop['reviewer_names']) {
+                        $names = explode(',', $workshop['reviewer_names']);
+                        $comments = explode(',', $workshop['review_comments']);
+                        
+                        for ($i = 0; $i < count($names) && $i < count($comments); $i++): ?>
+                          <div class="review-item mb-4 p-4 bg-light rounded-4">
+                            <div class="reviewer-info d-flex align-items-center mb-3">
+                              <div class="avatar bg-primary bg-opacity-10 px-3 py-2 rounded-circle me-3">
+                                <i class="bi bi-person-circle text-primary fs-4"></i>
+                              </div>
+                              <strong class="fs-5"><?= htmlspecialchars($names[$i]) ?></strong>
+                            </div>
+                            <p class="review-text mb-0 fst-italic">
+                              "<?= htmlspecialchars($comments[$i]) ?>"
+                            </p>
+                          </div>
+                        <?php endfor;
+                      } else { ?>
+                        <div class="text-center p-4 bg-light rounded-4">
+                          <i class="bi bi-chat-square-dots text-muted fs-1"></i>
+                          <p class="text-muted mt-3">Belum ada ulasan untuk workshop ini</p>
+                        </div>
+                      <?php } ?>
                     </div>
                   </div>
                 </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+
+                <div class="modal-footer border-0 p-4">
+                  <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Tutup
+                  </button>
                   <?php if($isLogin): ?>
-                    <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn btn-primary">
+                    <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn btn-primary rounded-pill px-4">
                       <i class="bi bi-arrow-right-circle me-2"></i>Daftar Sekarang
                     </a>
                   <?php else: ?>
-                    <a href="register.php" class="btn btn-primary">
+                    <a href="register.php" class="btn btn-primary rounded-pill px-4">
                       <i class="bi bi-person-plus me-2"></i>Daftar Sekarang
                     </a>
                   <?php endif; ?>
@@ -456,7 +594,7 @@ ini_set('display_errors', 1);
             </div>
           </div>
           <?php endforeach; ?>
-        </div>
+          </div>
 
         <!-- Enhanced Pagination -->
         <nav class="mt-5" aria-label="Workshop navigation">
@@ -781,127 +919,71 @@ ini_set('display_errors', 1);
   <!-- Main JS File -->
   <script src="landingpage/assets/js/main.js"></script>
   <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        const workshopsContainer = document.querySelector('.row.gy-4');
-        const searchInput = document.getElementById('workshopSearch');
-        const categorySelect = document.querySelector('.search-wrapper select');
-        const filterButtons = document.querySelectorAll('.filter-buttons .btn');
-
-        let workshops = Array.from(workshopsContainer.children);
-        
-        // Search filter
-        searchInput.addEventListener('input', filterWorkshops);
-        
-        // Category filter
-        categorySelect.addEventListener('change', filterWorkshops);
-        
-        // Active filter buttons
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                filterButtons.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                filterWorkshops();
-            });
-        });
-
-        function filterWorkshops() {
-            let searchQuery = searchInput.value.toLowerCase();
-            let selectedCategory = categorySelect.value;
-            let activeFilter = document.querySelector('.filter-buttons .btn.active')?.textContent.trim();
-
-            // Make sure the activeFilter exists
-            if (!activeFilter) return;
-
-            let filteredWorkshops = workshops.filter(workshop => {
-                let titleElement = workshop.querySelector('.card-title');
-                let descriptionElement = workshop.querySelector('.card-text');
-                let categoryElement = workshop.querySelector('.badge.bg-primary');
-
-                if (!titleElement || !descriptionElement || !categoryElement) return false;
-
-                let title = titleElement.textContent.toLowerCase();
-                let description = descriptionElement.textContent.toLowerCase();
-                let category = categoryElement.textContent;
-
-                let matchesSearch = title.includes(searchQuery) || description.includes(searchQuery);
-                let matchesCategory = selectedCategory === 'Semua Kategori' || category.includes(selectedCategory);
-                let matchesFilter = (activeFilter === 'Semua' || activeFilter === category);
-
-                return matchesSearch && matchesCategory && matchesFilter;
-            });
-
-            // Clear and append filtered workshops
-            workshopsContainer.innerHTML = '';
-            filteredWorkshops.forEach(workshop => {
-                workshopsContainer.appendChild(workshop);
-            });
-        }
-
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
-          const paginationLinks = document.querySelectorAll('.pagination .page-link');
-          const totalPages = Math.ceil(workshops.length / itemsPerPage);
-          const prevPageLink = document.getElementById('prevPage');
-          const nextPageLink = document.getElementById('nextPage');
+      const workshopCards = document.querySelectorAll('.workshop-card');
+      const searchInput = document.getElementById('workshopSearch');
+      const filterButtons = document.querySelectorAll('.filter-buttons .btn');
 
-          function updatePagination() {
-              paginationLinks.forEach((link, index) => {
-                  const pageNum = index + 1;
-                  if (pageNum > totalPages) {
-                      link.parentElement.style.display = 'none';
-                  } else {
-                      link.parentElement.style.display = 'block';
-                  }
-              });
-          }
-
-          paginationLinks.forEach(link => {
-              link.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  const newPage = parseInt(this.textContent);
-                  if (isNaN(newPage)) return;  // In case the link is not a number
-
-                  paginateWorkshops(newPage);
-                  updatePagination();
-              });
+      // Live Search Function
+      searchInput.addEventListener('input', function() {
+          const searchTerm = this.value.toLowerCase();
+          
+          workshopCards.forEach(card => {
+              const title = card.querySelector('.card-title').textContent.toLowerCase();
+              const description = card.querySelector('.card-text').textContent.toLowerCase();
+              const location = card.querySelector('.info-item:nth-child(2)').textContent.toLowerCase();
+              
+              const matches = title.includes(searchTerm) || 
+                            description.includes(searchTerm) || 
+                            location.includes(searchTerm);
+              
+              card.closest('.col-lg-4').style.display = matches ? 'block' : 'none';
           });
+      });
 
-          prevPageLink.addEventListener('click', function(e) {
-              e.preventDefault();
-              if (currentPage > 1) {
-                  currentPage--;
-                  paginateWorkshops(currentPage);
-                  updatePagination();
+      // Filter Buttons
+      filterButtons.forEach(button => {
+          button.addEventListener('click', function() {
+              filterButtons.forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+              
+              const filter = this.textContent.trim();
+              const cardArray = Array.from(workshopCards);
+              
+              switch(filter) {
+                  case 'Semua':
+                      workshopCards.forEach(card => {
+                          card.closest('.col-lg-4').style.display = 'block';
+                      });
+                      break;
+                      
+                  case 'Terbaru':
+                      // Sort by most recent workshops
+                      cardArray.sort((a, b) => {
+                          const dateA = new Date(a.querySelector('.info-item:first-child span').textContent);
+                          const dateB = new Date(b.querySelector('.info-item:first-child span').textContent);
+                          return dateB - dateA;
+                      });
+                      
+                      workshopCards.forEach(card => {
+                          card.closest('.col-lg-4').style.display = 'none';
+                      });
+                      
+                      cardArray.slice(0, 2).forEach(card => {
+                          card.closest('.col-lg-4').style.display = 'block';
+                      });
+                      break;
+                      
+                  case 'Best Seller':
+                      // Show random selection for now
+                      workshopCards.forEach(card => {
+                          card.closest('.col-lg-4').style.display = Math.random() > 0.5 ? 'block' : 'none';
+                      });
+                      break;
               }
           });
-
-          nextPageLink.addEventListener('click', function(e) {
-              e.preventDefault();
-              if (currentPage < totalPages) {
-                  currentPage++;
-                  paginateWorkshops(currentPage);
-                  updatePagination();
-              }
-          });
-
-          function paginateWorkshops(page) {
-              const totalWorkshops = Array.from(workshopsContainer.children);
-              const startIndex = (page - 1) * itemsPerPage;
-              const endIndex = startIndex + itemsPerPage;
-
-              totalWorkshops.forEach(workshop => workshop.style.display = 'none');
-              totalWorkshops.slice(startIndex, endIndex).forEach(workshop => workshop.style.display = 'block');
-
-              currentPage = page;
-          }
-
-          // Initialize pagination
-          paginateWorkshops(1);
-          updatePagination();
-   });
-
-
+      });
+  });
   </script>
 </body>
 

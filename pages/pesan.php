@@ -1,6 +1,37 @@
 <?php
 require '../controllers/function.php';
 checkAuth();
+// At the top of pesan.php after checkAuth()
+if(isset($_GET['mitra_id']) && isset($_GET['workshop_title'])) {
+    $mitra_id = $_GET['mitra_id'];
+    $workshop_title = urldecode($_GET['workshop_title']);
+    
+    // Get mitra details first
+    $mitra = getUserById($mitra_id);
+    
+    // Create initial contact if doesn't exist
+    $initial_message = "Halo, saya tertarik dengan workshop: $workshop_title. Boleh tanya informasi lebih lanjut?";
+    sendMessage($_SESSION['user_id'], $mitra_id, $initial_message);
+    
+    // Now the mitra will appear in contacts list
+    echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(() => {
+                    const mitraContact = document.querySelector(`[data-user-id='${mitra_id}']`);
+                    if(mitraContact) {
+                        const avatar = mitraContact.querySelector('.rounded-circle');
+                        if(avatar) {
+                            avatar.style.width = '35px';
+                            avatar.style.height = '35px';
+                            avatar.style.minWidth = '35px';
+                            avatar.style.aspectRatio = '1';
+                        }
+                        mitraContact.click();
+                    }
+                }, 500);
+            });
+        </script>";
+}
 
 $user_id = $_SESSION['user_id'];
 $contacts = getChatContacts($user_id);
@@ -153,6 +184,14 @@ $contacts = getChatContacts($user_id);
         margin-right: 15px;
         object-fit: cover;
     }
+    .rounded-circle {
+        width: 35px;
+        height: 35px;
+        min-width: 35px;
+        flex-shrink: 0;
+        aspect-ratio: 1;
+    }
+
 
     @media (max-width: 768px) {
         .chat-contacts {
@@ -371,10 +410,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Create new contact item
             const newContact = `
-                <a href="#" class="list-group-item list-group-item-action border-0 contact-item" 
+                <a href="#" class="list-group-item list-group-item-action border-0 contact-item"
                 data-user-id="${resultItem.dataset.userId}">
-                    <div class="d-flex align-items-start">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                <div class="d-flex align-items-start">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 overflow-hidden" style="width: 40px; height: 40px; min-width: 40px; flex-shrink: 0;aspect-ratio: 1;">
                             ${resultItem.dataset.userName.charAt(0).toUpperCase()}
                         </div>
                         <div class="flex-grow-1">
@@ -386,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <small class="text-truncate">Start a conversation</small>
                             </div>
                         </div>
-                    </div>
+                    </div>                
                 </a>
             `;
 

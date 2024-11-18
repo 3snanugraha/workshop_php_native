@@ -1,8 +1,8 @@
 <?php
-// dev_mode = 0
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+// dev_mode = 1
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 session_start();
 require 'function.php';
@@ -470,5 +470,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updatePassword'])) {
     header("Location: ../pages/profil.php");
     exit();
 }
+
+// Add new rating
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addRating'])) {
+    checkAuth();
+    require $db_path;
+    
+    $workshop_id = filter_input(INPUT_POST, 'workshop_id', FILTER_VALIDATE_INT);
+    $rating = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
+    $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_STRING);
+    
+    if(addRating($_SESSION['user_id'], $workshop_id, $rating, $comment)) {
+        $_SESSION['success'] = "Rating added successfully";
+    } else {
+        $_SESSION['error'] = "Failed to add rating";
+    }
+    
+    header("Location: ../pages/rating.php");
+    exit();
+}
+
+// Update existing rating
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editRating'])) {
+    checkAuth();
+    require $db_path;
+    
+    $feedback_id = filter_input(INPUT_POST, 'feedback_id', FILTER_VALIDATE_INT);
+    $rating = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
+    $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_STRING);
+    
+    if(updateRating($feedback_id, $rating, $comment)) {
+        $_SESSION['success'] = "Rating updated successfully";
+    } else {
+        $_SESSION['error'] = "Failed to update rating";
+    }
+    
+    header("Location: ../pages/rating.php");
+    exit();
+}
+
 
 

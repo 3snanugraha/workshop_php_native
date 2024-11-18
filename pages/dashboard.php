@@ -3,7 +3,7 @@ require '../controllers/function.php';
 checkAuth();
 $monthlyParticipants = getMonthlyParticipants();
 $role = $_SESSION['role'];
-$workshops = getAllWorkshops();
+$workshops = getWorkshopsWithMitra(); // Using the enhanced function
 
 ?>
 <!DOCTYPE html>
@@ -264,49 +264,73 @@ $workshops = getAllWorkshops();
 
         </div>
       <?php }else if($role=='user'){ ?>
-      <!-- Dashboard Untuk Peserta -->
-      <div class="row mb-3">
-          <div class="col-md-4">
-              <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-search"></i></span>
-                  <input type="text" class="form-control" id="searchWorkshop" placeholder="Cari workshop...">
-              </div>
-          </div>
-      </div>
+        <!-- Dashboard Untuk Peserta -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="searchWorkshop" placeholder="Cari workshop...">
+                </div>
+            </div>
+        </div>
 
-      <div class="row">
-          <?php 
-          foreach($workshops as $workshop) { 
-          ?>
-          <div class="col-lg-4 col-md-6 mb-4">
-              <div class="card h-100 workshop-card">
-                  <img src="assets/img/workshops/<?= $workshop['banner'] ?>" class="card-img-top" alt="Workshop Banner" style="height: 200px; object-fit: cover;">
-                  <div class="card-body">
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                          <span class="badge <?= ($workshop['status'] == 'active') ? 'bg-success' : 'bg-danger' ?>"><?= $workshop['status'] ?></span>
-                          <small class="text-muted">By <?= $workshop['mitra_name'] ?></small>
-                      </div>
-                      <h5 class="card-title text-truncate"><?= $workshop['title'] ?></h5>
-                      <p class="card-text text-truncate"><?= $workshop['description'] ?></p>
-                      <div class="workshop-details">
-                          <div class="mb-2">
-                              <i class="bi bi-geo-alt"></i> <?= $workshop['location'] ?>
+        <div class="row">
+            <?php 
+            foreach($workshops as $workshop) { 
+            ?>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 workshop-card">
+                    <img src="assets/img/workshops/<?= $workshop['banner'] ?>" class="card-img-top" alt="Workshop Banner" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge <?= ($workshop['status'] == 'active') ? 'bg-success' : 'bg-danger' ?>"><?= $workshop['status'] ?></span>
+                            <small class="text-muted">By <?= $workshop['mitra_first_name'] . ' ' . $workshop['mitra_last_name'] ?></small>
+                        </div>
+                        <h5 class="card-title text-truncate"><?= $workshop['title'] ?></h5>
+                        <p class="card-text text-truncate brand-color"><?= $workshop['description'] ?></p>
+                        
+                        <!-- Rating Section -->
+                        <div class="rating-wrapper mb-3">
+                          <div class="stars">
+                              <?php
+                              $rating = round($workshop['average_rating']);
+                              for ($i = 1; $i <= 5; $i++) {
+                                  echo $i <= $rating ? 
+                                      '<i class="bi bi-star-fill text-warning"></i>' : 
+                                      '<i class="bi bi-star text-muted"></i>';
+                              }
+                              ?>
+                              <span class="ms-2 text-muted">
+                                  <?= number_format($workshop['average_rating'], 1) ?> 
+                                  (<?= $workshop['total_reviews'] ?> ulasan)
+                              </span>
                           </div>
-                          <div class="mb-2">
-                              <i class="bi bi-calendar-event"></i> <?= date('d M Y', strtotime($workshop['start_date'])) ?>
-                          </div>
-                          <div class="mb-2">
-                              <b><i class="bi bi-cash"></i> Rp <?= number_format($workshop['price'], 0, ',', '.') ?></b>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="card-footer bg-transparent border-top-0">
-                      <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn brand-btn w-100 rounded-pill"><i class="bi bi-cart-plus"></i> Pesan Sekarang</a>
-                  </div>              
-              </div>
-          </div>
-          <?php } ?>
-      </div>
+                        </div>
+
+                        <div class="workshop-details">
+                            <div class="mb-2">
+                                <i class="bi bi-geo-alt"></i> <?= $workshop['location'] ?>
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-calendar-event"></i> <?= date('d M Y', strtotime($workshop['start_date'])) ?>
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-people-fill"></i> <?= $workshop['total_participants'] ?> peserta
+                            </div>
+                            <div class="mb-2">
+                                <b><i class="bi bi-cash"></i> Rp <?= number_format($workshop['price'], 0, ',', '.') ?></b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn brand-btn w-100 rounded-pill">
+                            <i class="bi bi-cart-plus"></i> Pesan Sekarang
+                        </a>
+                    </div>              
+                </div>
+            </div>
+            <?php } ?>
+        </div>
       <!-- Dashboard Mitra-->
       <?php }else if($role=='mitra'){ ?>
         <div class="row">

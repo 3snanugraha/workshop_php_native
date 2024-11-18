@@ -1,8 +1,8 @@
 <?php
-// dev_mode
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+// dev_mode = 1
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
 // Fungsi Umum
@@ -96,13 +96,14 @@ function getUsersByRole($role) {
 
 // Fungsi Read - Mendapatkan satu pengguna berdasarkan ID
 function getUserById($user_id) {
-    global $conn;
+    require '../databases/database.php';
+    
     $sql = "SELECT * FROM users WHERE user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
+    
     $result = $stmt->get_result();
-
     return $result->fetch_assoc();
 }
 
@@ -381,7 +382,6 @@ function countTotalEarnings() {
 function getWorkshopsWithMitra() {
     require '../databases/database.php';
 
-    // Query untuk mengambil semua data workshop dan relasikan dengan data mitra yang memiliki role 'mitra'
     $query = "
         SELECT 
             w.workshop_id,
@@ -403,17 +403,24 @@ function getWorkshopsWithMitra() {
             m.last_name AS mitra_last_name,
             m.email AS mitra_email,
             m.phone AS mitra_phone,
-            DATEDIFF(w.end_date, w.start_date) + 1 AS duration_days
+            DATEDIFF(w.end_date, w.start_date) + 1 AS duration_days,
+            AVG(f.rating) as average_rating,
+            COUNT(DISTINCT f.feedback_id) as total_reviews,
+            COUNT(DISTINCT r.registration_id) as total_participants,
+            GROUP_CONCAT(DISTINCT CONCAT(u.first_name, ' ', u.last_name)) as reviewer_names,
+            GROUP_CONCAT(DISTINCT f.comment) as review_comments
         FROM workshops w
         LEFT JOIN users m ON w.mitra_id = m.user_id
+        LEFT JOIN feedback f ON w.workshop_id = f.workshop_id
+        LEFT JOIN users u ON f.user_id = u.user_id
+        LEFT JOIN registrations r ON w.workshop_id = r.workshop_id
         WHERE m.role = 'mitra' AND w.status = 'active'
+        GROUP BY w.workshop_id
         ORDER BY w.created_at DESC
     ";
 
-    // Eksekusi query
     $result = mysqli_query($conn, $query);
 
-    // Mengecek apakah query berhasil
     if ($result) {
         $workshops = mysqli_fetch_all($result, MYSQLI_ASSOC);
         return $workshops;
@@ -421,6 +428,7 @@ function getWorkshopsWithMitra() {
         return "Error fetching workshops: " . mysqli_error($conn);
     }
 }
+
 // ========================================
 //          SESSION FUNCTION
 // ========================================
@@ -546,14 +554,23 @@ function handleBannerUpload($file) {
 function getAllWorkshops() {
     require '../databases/database.php';
     
-    $sql = "SELECT w.*, CONCAT(u.first_name, ' ', u.last_name) as mitra_name 
+    $sql = "SELECT 
+            w.*,
+            CONCAT(u.first_name, ' ', u.last_name) as mitra_name,
+            AVG(f.rating) as average_rating,
+            COUNT(DISTINCT f.feedback_id) as total_reviews,
+            COUNT(DISTINCT r.registration_id) as total_participants
             FROM workshops w 
             LEFT JOIN users u ON w.mitra_id = u.user_id 
+            LEFT JOIN feedback f ON w.workshop_id = f.workshop_id
+            LEFT JOIN registrations r ON w.workshop_id = r.workshop_id
+            GROUP BY w.workshop_id
             ORDER BY w.created_at DESC";
     
     $result = $conn->query($sql);
     return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
+
 
 function getWorkshopById($workshop_id) {
     require '../databases/database.php';
@@ -1008,6 +1025,79 @@ function updateUserPassword($user_id, $current_password, $new_password) {
     $stmt->bind_param("si", $hashed_password, $user_id);
     return $stmt->execute();
 }
+
+// ================================
+//  RATING FUNCTION
+// ================================
+function getPurchasedWorkshops($user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT 
+            w.*,
+            r.registration_id,
+            p.payment_status,
+            f.rating as user_rating,
+            f.comment,
+            f.feedback_id
+            FROM workshops w
+            JOIN registrations r ON w.workshop_id = r.workshop_id
+            JOIN payments p ON r.registration_id = p.registration_id
+            LEFT JOIN feedback f ON w.workshop_id = f.workshop_id AND f.user_id = ?
+            WHERE r.user_id = ? 
+            AND p.payment_status = 'successful'
+            ORDER BY r.registration_date DESC";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $user_id, $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
+// Add new rating
+function addRating($user_id, $workshop_id, $rating, $comment) {
+    require '../databases/database.php';
+    
+    $sql = "INSERT INTO feedback (user_id, workshop_id, rating, comment) 
+            VALUES (?, ?, ?, ?)";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiis", $user_id, $workshop_id, $rating, $comment);
+    return $stmt->execute();
+}
+
+// Update existing rating
+function updateRating($feedback_id, $rating, $comment) {
+    require '../databases/database.php';
+    
+    $sql = "UPDATE feedback 
+            SET rating = ?, 
+                comment = ?, 
+                created_at = CURRENT_TIMESTAMP 
+            WHERE feedback_id = ?";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("isi", $rating, $comment, $feedback_id);
+    return $stmt->execute();
+}
+
+function getWorkshopRatings() {
+    require '../databases/database.php';
+    
+    $sql = "SELECT f.*, 
+            w.title as workshop_title,
+            CONCAT(u.first_name, ' ', u.last_name) as user_name,
+            w.mitra_id
+            FROM feedback f
+            JOIN workshops w ON f.workshop_id = w.workshop_id 
+            JOIN users u ON f.user_id = u.user_id
+            ORDER BY f.created_at DESC";
+            
+    $result = $conn->query($sql);
+    return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+
 
 
 
