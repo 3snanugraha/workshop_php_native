@@ -397,3 +397,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['logout'])) {
     exit;
 }
 
+
+// Profil
+// Update Profile
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateProfile'])) {
+    checkAuth();
+    require $db_path;
+    
+    $update_result = updateUserProfile(
+        $_SESSION['user_id'],
+        $_POST['first_name'],
+        $_POST['last_name'], 
+        $_POST['email'],
+        $_POST['phone']
+    );
+    
+    if($update_result) {
+        $_SESSION['success'] = "Profile updated successfully";
+    } else {
+        $_SESSION['error'] = "Failed to update profile";
+    }
+    header("Location: ../pages/profil.php");
+    exit();
+}
+
+// Update Password
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updatePassword'])) {
+    checkAuth();
+    require $db_path;
+    
+    if($_POST['new_password'] !== $_POST['confirm_password']) {
+        $_SESSION['error'] = "New passwords do not match";
+        header("Location: ../pages/profil.php");
+        exit();
+    }
+    
+    $update_result = updateUserPassword(
+        $_SESSION['user_id'],
+        $_POST['current_password'],
+        $_POST['new_password']
+    );
+    
+    if($update_result) {
+        $_SESSION['success'] = "Password updated successfully";
+    } else {
+        $_SESSION['error'] = "Current password is incorrect";
+    }
+    header("Location: ../pages/profil.php");
+    exit();
+}
+
+

@@ -148,7 +148,8 @@ $events = getEvents();
             </nav>
         </div><!-- End Page Title -->
 
-        <section class="section dashboard">
+        <?php require 'alert.php'; ?>
+<section class="section dashboard">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">

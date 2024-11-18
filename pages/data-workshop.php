@@ -58,7 +58,8 @@ $workshops = getWorkshopByMitraId($_SESSION['user_id']);
       </nav>
     </div><!-- End Page Title -->
 
-    <section class="section dashboard">
+    <?php require 'alert.php'; ?>
+<section class="section dashboard">
       <div class="row">
 
         <!-- Full side columns -->

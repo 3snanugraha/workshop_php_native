@@ -876,4 +876,88 @@ function searchUsers($search_term) {
 }
 
 
+// Get unread messages count and details
+function getUnreadMessages($user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT c.*, 
+            CONCAT(s.first_name, ' ', s.last_name) as sender_name,
+            s.user_id as sender_id
+            FROM chats c
+            JOIN users s ON c.sender_id = s.user_id
+            WHERE c.receiver_id = ? 
+            AND c.is_read = 0
+            ORDER BY c.sent_at DESC 
+            LIMIT 5";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $messages = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    // Get total unread count
+    $sql = "SELECT COUNT(*) as total 
+            FROM chats 
+            WHERE receiver_id = ? 
+            AND is_read = 0";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $total = $stmt->get_result()->fetch_assoc()['total'];
+    
+    return [
+        'total_unread' => $total,
+        'messages' => $messages
+    ];
+}
+
+
+// Profil Function
+function getUserProfile($user_id) {
+    require '../databases/database.php';
+    $sql = "SELECT user_id, username, first_name, last_name, email, phone, role, created_at 
+            FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+
+function updateUserProfile($user_id, $first_name, $last_name, $email, $phone) {
+    require '../databases/database.php';
+
+    
+    $sql = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssi", $first_name, $last_name, $email, $phone, $user_id);
+    return $stmt->execute();
+}
+
+function updateUserPassword($user_id, $current_password, $new_password) {
+    require '../databases/database.php';
+
+    
+    // Verify current password
+    $sql = "SELECT password FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    
+    if(!password_verify($current_password, $result['password'])) {
+        return false;
+    }
+    
+    // Update to new password
+    $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+    $sql = "UPDATE users SET password = ? WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $hashed_password, $user_id);
+    return $stmt->execute();
+}
+
+
+
 ?>

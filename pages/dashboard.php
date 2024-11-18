@@ -78,7 +78,8 @@ $workshops = getAllWorkshops();
       </nav>
     </div><!-- End Page Title -->
 
-    <section class="section dashboard">
+    <?php require 'alert.php'; ?>
+<section class="section dashboard">
       <!-- Dashboard untuk Admin -->
       <?php if($role=='admin'){ ?>
         <div class="row">

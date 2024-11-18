@@ -70,7 +70,8 @@ $payments = getPaymentData($_SESSION['user_id']);
       </div>
     <?php endif; ?>
 
-    <section class="section dashboard">
+    <?php require 'alert.php'; ?>
+<section class="section dashboard">
       <div class="row">
 
         <!-- Full side columns -->

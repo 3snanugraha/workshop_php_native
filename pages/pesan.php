@@ -45,33 +45,137 @@ $contacts = getChatContacts($user_id);
     .chat-contacts {
         height: 550px;
         overflow-y: auto;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
 
     .contact-item {
-        padding: 1rem;
-        transition: background-color 0.3s;
+        padding: 1.2rem;
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        margin: 5px 10px;
     }
 
     .contact-item:hover {
         background-color: rgba(0,0,0,0.05);
+        transform: translateX(5px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .contact-item.active {
         background-color: rgba(0,0,0,0.1);
+        border-left: 4px solid #007bff;
     }
 
     .chat-message {
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
+        /* animation: fadeIn 0.5s ease; */
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .message-bubble {
-        background-color: #f1f1f1;
+        background-color: #f8f9fa;
         max-width: 70%;
+        padding: 12px 20px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        position: relative;
     }
 
     .own-message .message-bubble {
-        background-color: #007bff;
+        background: linear-gradient(135deg, #007bff, #0056b3);
         color: white;
+    }
+
+    .chat-area {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .chat-input {
+        background-color: #f8f9fa;
+        border-radius: 0 0 15px 15px;
+        padding: 20px !important;
+    }
+
+    .chat-input .form-control {
+        border-radius: 25px;
+        padding: 12px 20px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .chat-input .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+
+    .chat-input .btn {
+        border-radius: 25px;
+        padding: 10px 25px;
+        margin-left: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .chat-input .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+    }
+
+    #user-search {
+        border-radius: 25px;
+        padding: 12px 20px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    #search-results {
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 5px;
+    }
+
+    .chat-messages {
+        padding: 20px;
+        background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+        border-radius: 15px;
+    }
+
+    .avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+        .chat-contacts {
+            height: 300px;
+        }
+        
+        .chat-area {
+            height: 400px !important;
+            margin-top: 20px;
+        }
+
+        .contact-item {
+            padding: 0.8rem;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+        }
     }
    </style>
 </head>
@@ -91,14 +195,15 @@ $contacts = getChatContacts($user_id);
           <li class="breadcrumb-item active">Pesan</li>
         </ol>
       </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section dashboard">
+    </div>
+    <!-- End Page Title -->
+    <?php require 'alert.php'; ?>
+<section class="section dashboard">
             <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row g-0">
+                        <div class="row g-0 mt-3">
                             <!-- Contacts List -->
                             <div class="col-12 col-lg-4 border-end">
                                 <div class="px-4 d-none d-md-block">
@@ -114,9 +219,12 @@ $contacts = getChatContacts($user_id);
                                         <a href="#" class="list-group-item list-group-item-action border-0 contact-item" 
                                         data-user-id="<?= $contact['user_id'] ?>">
                                             <div class="d-flex align-items-start">
-                                                <div class="flex-grow-1 ml-3">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                                                <?= strtoupper(substr($contact['first_name'], 0, 1)) ?>
+                                            </div>
+                                                <div class="flex-grow-1">
                                                     <div class="d-flex justify-content-between align-items-center">
-                                                        <h5 class="mb-0"><?= $contact['first_name'] . ' ' . $contact['last_name'] ?></h5>
+                                                        <h5 class="mb-0 text-dark"><?= $contact['first_name'] . ' ' . $contact['last_name'] ?></h5>
                                                         <small class="text-muted"><?= date('H:i', strtotime($contact['last_message_time'])) ?></small>
                                                     </div>
                                                     <div class="d-flex justify-content-between">
@@ -135,7 +243,7 @@ $contacts = getChatContacts($user_id);
                             <!-- Chat Area -->
                             <div class="col-12 col-lg-8">
                                 <div class="chat-area d-flex flex-column" style="height: 600px;">
-                                <div class="px-4 d-none d-md-block">
+                                <div class="px-4 d-md-block">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
                                             <input type="text" class="form-control my-3" id="user-search" 
@@ -154,7 +262,7 @@ $contacts = getChatContacts($user_id);
                                     <div class="chat-input px-4 py-3 border-top">
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="message-input" placeholder="Type your message...">
-                                            <button class="btn brand-btn" type="button" id="send-message">Send</button>
+                                            <button class="btn brand-btn" type="button" id="send-message"><i class="bi bi-send"></i> Send</button>
                                         </div>
                                     </div>
                                 </div>
@@ -166,16 +274,15 @@ $contacts = getChatContacts($user_id);
         </div>
     </section>  
   </main>
-  </main><!-- End #main -->
-
-  <?php require "modals.php";?>
+  <!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer brand-bg-color">
     <div class="copyright text-light">
       © Copyright <strong><span>WorkSmart</span></strong>. All Rights Reserved
     </div>
-  </footer><!-- End Footer -->
+  </footer>
+  <!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -261,9 +368,46 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!resultItem) return;
             
             e.preventDefault();
+            
+            // Create new contact item
+            const newContact = `
+                <a href="#" class="list-group-item list-group-item-action border-0 contact-item" 
+                data-user-id="${resultItem.dataset.userId}">
+                    <div class="d-flex align-items-start">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                            ${resultItem.dataset.userName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 text-dark">${resultItem.dataset.userName}</h5>
+                                <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-truncate">Start a conversation</small>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `;
+
+            // Add to chat contacts
+            document.querySelector('.chat-contacts').insertAdjacentHTML('afterbegin', newContact);
+            
+            // Initialize chat with new contact
             initializeChat(resultItem.dataset.userId, resultItem.dataset.userName);
+            
+            // Clear search
             elements.searchResults.classList.add('d-none');
             elements.userSearch.value = '';
+            
+            // Add click event to new contact
+            const newContactElement = document.querySelector(`[data-user-id="${resultItem.dataset.userId}"]`);
+            newContactElement.addEventListener('click', function(e) {
+                e.preventDefault();
+                initializeChat(this.dataset.userId, resultItem.dataset.userName);
+                document.querySelectorAll('.contact-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
     }
 
@@ -295,7 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     elements.chatMessages.insertAdjacentHTML('beforeend', messageHtml);
                 });
-                elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
             });
     }
 
@@ -345,6 +488,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    // Add this inside your existing DOMContentLoaded event listener
+    if (elements.userSearch) {
+        elements.userSearch.addEventListener('input', debounce(function() {
+            const searchTerm = this.value.trim();
+            if (searchTerm.length < 2) {
+                elements.searchResults.classList.add('d-none');
+                return;
+            }
+            performSearch(searchTerm);
+        }, 300));
+    }
+
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -357,18 +512,30 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Auto refresh chat
-    setInterval(() => {
-        if (currentReceiverId) {
-            loadChatHistory(currentReceiverId);
+    // Add periodic chat updates
+        function startRealtimeUpdates() {
+            if (currentReceiverId) {
+                loadChatHistory(currentReceiverId);
+            }
         }
-    }, 5000);
+
+        // Update every 3 seconds
+        setInterval(startRealtimeUpdates, 3000);
+
+        // Also update the contact list
+        function updateContacts() {
+            fetch('get_contacts.php')
+                .then(response => response.json())
+                .then(contacts => {
+                    const contactsContainer = document.querySelector('.chat-contacts');
+                    // Update contacts list with new messages and unread counts
+                });
+        }
+
+        setInterval(updateContacts, 5000);
+
 });
 </script>
-
-
-
-
 </body>
 
 </html>

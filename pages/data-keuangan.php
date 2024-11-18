@@ -57,7 +57,8 @@ checkAuth();
       </nav>
     </div><!-- End Page Title -->
 
-    <section class="section dashboard">
+    <?php require 'alert.php'; ?>
+<section class="section dashboard">
       <div class="row">
 
         <!-- Left side columns -->
