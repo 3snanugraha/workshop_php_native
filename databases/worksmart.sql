@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 17, 2024 at 11:01 PM
+-- Generation Time: Nov 18, 2024 at 03:41 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -42,7 +42,7 @@ CREATE TABLE `banks` (
 --
 
 INSERT INTO `banks` (`bank_id`, `bank_name`, `account_name`, `account_number`, `swift_code`, `is_active`, `created_at`) VALUES
-(1, 'Bank BRI', 'Trisna Nugraha', '404201024853536', '24', 1, '2024-11-16 19:59:19');
+(1, 'Bank Mandiri', 'Mufrida Fara Diani', '1430029739875', 'BMRIIDJAXXX', 1, '2024-11-16 19:59:19');
 
 -- --------------------------------------------------------
 
@@ -73,14 +73,6 @@ CREATE TABLE `feedback` (
   `comment` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `feedback`
---
-
-INSERT INTO `feedback` (`feedback_id`, `user_id`, `workshop_id`, `rating`, `comment`, `created_at`) VALUES
-(1, 1, 3, 5, 'Workshop yang sangat bermanfaat dan menarik.', '2024-12-01 09:00:00'),
-(2, 19, 3, 5, 'Materi workshop cukup bagus, tetapi bisa lebih interaktif.', '2024-12-05 10:00:00');
 
 -- --------------------------------------------------------
 
@@ -118,7 +110,9 @@ CREATE TABLE `payments` (
 --
 
 INSERT INTO `payments` (`payment_id`, `registration_id`, `amount`, `payment_date`, `payment_method`, `payment_status`, `payment_receipt`, `bank_id`) VALUES
-(8, 14, 550000.00, '2024-11-18 04:58:03', 'bank_transfer', 'successful', 'INV-14.jpeg', 1);
+(8, 14, 550000.00, '2024-11-18 04:58:03', 'bank_transfer', 'successful', 'INV-14.jpeg', 1),
+(9, 15, 600000.00, '2024-11-18 07:50:49', 'bank_transfer', 'successful', 'INV-15.jpg', 1),
+(10, 16, 350000.00, '2024-11-18 08:48:42', 'bank_transfer', 'successful', 'INV-16.jpeg', 1);
 
 -- --------------------------------------------------------
 
@@ -141,7 +135,9 @@ CREATE TABLE `registrations` (
 --
 
 INSERT INTO `registrations` (`registration_id`, `user_id`, `workshop_id`, `registration_date`, `status`, `created_at`, `updated_at`) VALUES
-(14, 25, 15, '2024-11-18 04:58:03', 'registered', '2024-11-17 21:58:03', '2024-11-17 21:58:03');
+(14, 25, 15, '2024-11-18 04:58:03', 'registered', '2024-11-17 21:58:03', '2024-11-17 21:58:03'),
+(15, 25, 14, '2024-11-18 07:50:49', 'registered', '2024-11-18 00:50:49', '2024-11-18 00:50:49'),
+(16, 26, 11, '2024-11-18 08:48:42', 'registered', '2024-11-18 01:48:42', '2024-11-18 01:48:42');
 
 -- --------------------------------------------------------
 
@@ -167,9 +163,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name`, `email`, `phone`, `role`, `created_at`, `updated_at`) VALUES
-(23, 'mitratama', '$2y$10$VIt0/ssFv8ttYmOVoijjkelOsP80iOOepKlyGTLlda8/JCwjjbE2i', 'Mitra', 'Tama', 'mitratama@gmail.com', '6288989472152', 'mitra', '2024-11-17 20:01:35', '2024-11-17 20:01:35'),
+(23, 'mitratama', '$2y$10$VIt0/ssFv8ttYmOVoijjkelOsP80iOOepKlyGTLlda8/JCwjjbE2i', 'Mitra', 'Tama', 'mitratama@gmail.com', '6288989472152', 'mitra', '2024-11-17 20:01:35', '2024-11-18 01:28:13'),
 (24, 'admin', '$2y$10$IAOtsD3XjAguw.aBAqCgd.VUKp5xvULVIFRU207oXjQnhpucDtBTm', 'Admin', 'Tama', 'admin@gmail.com', '6288989472152', 'admin', '2024-11-17 20:01:35', '2024-11-17 21:31:50'),
-(25, 'tama', '$2y$10$q7v3KXtdiXaogdXHuCUy5eS8x6uRMbTp9EAI7CRbfDL3SEm4eXkOK', 'Peserta', 'Tama', 'pesertatama@gmail.com', '6288989472152', 'user', '2024-11-17 20:01:35', '2024-11-17 20:01:35');
+(25, 'pesertatama', '$2y$10$q7v3KXtdiXaogdXHuCUy5eS8x6uRMbTp9EAI7CRbfDL3SEm4eXkOK', 'Peserta', 'Tama', 'pesertatama@gmail.com', '6288989472152', 'user', '2024-11-17 20:01:35', '2024-11-18 01:28:31'),
+(26, 'mufrida', '$2y$10$Cy01N700tUpCs.jGsIbohe6B/wqFNsUkcu1.QBoJy6XiVwkSGR2gq', 'mufrida', 'Nugraha', 'mufrida@gmail.com', '62895339046899', 'user', '2024-11-18 01:47:42', '2024-11-18 02:40:42');
 
 -- --------------------------------------------------------
 
@@ -316,7 +313,7 @@ ALTER TABLE `banks`
 -- AUTO_INCREMENT for table `chats`
 --
 ALTER TABLE `chats`
-  MODIFY `chat_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `chat_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -334,19 +331,19 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `registrations`
 --
 ALTER TABLE `registrations`
-  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `workshops`

@@ -12,7 +12,7 @@ $fe_path='../pages/';
 
 
 
-// Payment verification handler
+// Payment verification handler 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verifyPayment'])) {
     require $db_path;
     
@@ -24,14 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verifyPayment'])) {
         $stmt->bind_param("i", $payment_id);
         
         if($stmt->execute()) {
-            echo "success";
+            echo json_encode(['status' => 'success', 'message' => 'Payment verified successfully']);
         } else {
             http_response_code(500);
-            echo "error";
+            echo json_encode(['status' => 'error', 'message' => 'Failed to verify payment']);
         }
     }
     exit();
 }
+
 
 // Workshop Payment Processing
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bayar'])) {

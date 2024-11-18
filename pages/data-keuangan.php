@@ -159,19 +159,19 @@ $data = getFinancialDataAdmin();
                             <i class="bi bi-eye"></i>
                           </button>
                           <?php if($datas['payment_status'] != 'successful'): ?>
-                          <button class="btn btn-sm btn-success verifyBtn" data-id="<?= $datas['payment_id'] ?>">
-                            <i class="bi bi-check-circle"></i>
-                          </button>
+                            <button id="verifyBtn<?= $datas['payment_id'] ?>" class="btn btn-sm btn-success" onclick="verifyPayment(<?= $datas['payment_id'] ?>)">
+                              <i class="bi bi-check-circle"></i>
+                            </button>
                           <?php endif; ?>
                         </td>
                       </tr>
 
                       <!-- Detail Modal -->
-                      <div class="modal fade" id="detailModal<?= $datas['payment_id'] ?>" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal fade" id="detailModal<?= $datas['payment_id'] ?>" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel<?= $datas['payment_id'] ?>" aria-hidden="false">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title">Detail Transaksi</h5>
+                              <h5 class="modal-title" id="detailModalLabel<?= $datas['payment_id'] ?>">Detail Transaksi</h5>
                               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
@@ -304,28 +304,27 @@ $data = getFinancialDataAdmin();
       });
     });
 
-    $(document).ready(function() {
-      $('.verifyBtn').click(function() {
-        let paymentId = $(this).data('id');
-        if(confirm('Verifikasi pembayaran ini?')) {
-          $.ajax({
+    function verifyPayment(paymentId) {
+    if(confirm('Verifikasi pembayaran ini?')) {
+        $.ajax({
             url: '../controllers/controller.php',
             type: 'POST',
             data: {
-              verifyPayment: true,
-              payment_id: paymentId
+                verifyPayment: true,
+                payment_id: paymentId
             },
             success: function(response) {
-              alert('Pembayaran berhasil diverifikasi');
-              location.reload();
+                alert('Pembayaran berhasil diverifikasi');
+                location.reload();
             },
             error: function() {
-              alert('Terjadi kesalahan');
+                alert('Terjadi kesalahan');
             }
-          });
-        }
-      });
-    });
+        });
+    }
+}
+
+
   </script>
 
 </body>
