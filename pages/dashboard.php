@@ -4,6 +4,7 @@ checkAuth();
 $monthlyParticipants = getMonthlyParticipants();
 $role = $_SESSION['role'];
 $workshops = getWorkshopsWithMitra(); // Using the enhanced function
+$actualEarnings = getTotalPenghasilanByMitraId($_SESSION['user_id']);
 
 ?>
 <!DOCTYPE html>
@@ -340,7 +341,7 @@ $workshops = getWorkshopsWithMitra(); // Using the enhanced function
                     <div class="col-xxl-4 col-md-4">
                         <div class="card info-card sales-card">
                             <div class="card-body">
-                                <h5 class="card-title brand-color">Total Pemasukan</h5>
+                                <h5 class="card-title brand-color">Hasil Pendaftaran</h5>
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                         <i class="bi bi-currency-dollar"></i>
@@ -381,6 +382,23 @@ $workshops = getWorkshopsWithMitra(); // Using the enhanced function
                                     </div>
                                     <div class="ps-3">
                                         <h6><?= countMitraWorkshops($_SESSION['user_id']) ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings Actual Card -->
+                    <div class="col-xxl-12 col-md-12">
+                        <div class="card info-card sales-card">
+                            <div class="card-body">
+                                <h5 class="card-title brand-color">Total Penghasilan</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>Rp <?= number_format($actualEarnings, 0, ',', '.') ?></h6>
                                     </div>
                                 </div>
                             </div>

@@ -509,5 +509,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editRating'])) {
     exit();
 }
 
+// Tambah Pengeluaran Untuk Transfer Mitra
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addExpense'])) {
+    checkAuth();
+    require $db_path;
+    // Mengambil input dari form
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
+    $category = mysqli_real_escape_string($conn, $_POST['category']);
+    $amount = mysqli_real_escape_string($conn, $_POST['amount']);
+    $expense_date = mysqli_real_escape_string($conn, $_POST['expense_date']);
+    $mitra_id = mysqli_real_escape_string($conn, $_POST['mitra_id']);
+    
+    // Query untuk menambah data pengeluaran
+    $sql = "INSERT INTO expenses (description, category, amount, expense_date, mitra_id)
+            VALUES ('$description', '$category', '$amount', '$expense_date', '$mitra_id')";
+
+    if ($conn->query($sql) === TRUE) {
+        // Redirect atau tampilkan pesan sukses setelah berhasil menambah pengeluaran
+        echo "<script>alert('Pengeluaran berhasil ditambahkan!'); window.location.href='../pages/data-keuangan.php';</script>";
+    } else {
+        // Jika terjadi kesalahan dalam query
+        echo "<script>alert('Terjadi kesalahan. Pengeluaran tidak dapat ditambahkan.'); window.location.href='../pages/data-keuangan.php';</script>";
+    }
+}
+
+// Menangani request untuk menghapus pengeluaran (Delete)
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['deleteExpense'])) {
+    $auth = checkInputAuth();
+    if (!$auth) {
+        echo "<script>alert('Anda tidak diizinkan untuk operasi ini.');window.location='../pages/index.php';</script>";
+        exit();
+    } else {
+        require '../databases/database.php'; // Pastikan file koneksi database sudah disertakan
+
+        $expense_id = mysqli_real_escape_string($conn, $_GET['deleteExpense']); // Mengamankan ID pengeluaran yang akan dihapus
+        $deleteResult = deleteExpense($expense_id); // Fungsi untuk menghapus pengeluaran
+        
+        // Setelah penghapusan, arahkan ke halaman yang sesuai
+        if ($deleteResult === "Pengeluaran berhasil dihapus.") {
+            echo "<script>alert('$deleteResult');</script>";
+        } else {
+            echo "<script>alert('$deleteResult');</script>";
+        }
+        echo "<script>window.location.href='../pages/data-keuangan.php';</script>"; // Redirect setelah penghapusan
+        exit;
+    }
+}
 
 

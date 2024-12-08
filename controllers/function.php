@@ -243,8 +243,6 @@ function getPopularWorkshop() {
     }
 }
 
-
-
 // Peserta bulanan
 function getMonthlyParticipants() {
     require '../databases/database.php';
@@ -259,7 +257,6 @@ function getMonthlyParticipants() {
 
     return $monthlyParticipants;
 }
-
 // Fungsi untuk mengambil acara dari database
 function getEvents() {
     require '../databases/database.php';
@@ -296,7 +293,6 @@ function getEvents() {
 
     return $events;
 }
-
 
 // Rekap Data Keuangan
 function getFinancialData() {
@@ -374,6 +370,210 @@ function countTotalEarnings() {
         return 0; // Jika tidak ada data, kembalikan 0
     }
 }
+
+// Fungsi untuk mendapatkan data pengeluaran
+function getExpensesData() {
+    require '../databases/database.php'; // Pastikan koneksi database di-include di sini
+
+    // Query untuk mengambil data pengeluaran dengan join ke tabel users dan memastikan role adalah 'mitra'
+    $sql = "SELECT 
+                e.expense_id,
+                e.amount,
+                e.description,
+                e.category,
+                DATE_FORMAT(e.expense_date, '%d/%m/%Y') as expense_date,
+                CONCAT(u.first_name, ' ', u.last_name) as mitra_name  -- Menggabungkan first_name dan last_name untuk nama mitra
+            FROM expenses e
+            JOIN users u ON e.mitra_id = u.user_id  -- Join dengan tabel users berdasarkan mitra_id
+            WHERE u.role = 'mitra'  -- Pastikan hanya mitra yang terambil
+            ORDER BY e.expense_date DESC"; // Menampilkan pengeluaran berdasarkan tanggal
+
+    // Menjalankan query dan mendapatkan hasilnya
+    $result = $conn->query($sql);
+
+    // Cek apakah ada hasil dari query
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC); // Mengembalikan data dalam bentuk array asosiatif
+    } else {
+        return []; // Jika tidak ada data, mengembalikan array kosong
+    }
+}
+
+// Fungsi untuk mendapatkan data pengeluaran
+function getExpensesDataMitraId($mitra_id) {
+    require '../databases/database.php'; // Pastikan koneksi database di-include di sini
+
+    // Query untuk mengambil data pengeluaran dengan join ke tabel users dan memastikan role adalah 'mitra'
+    $sql = "SELECT 
+                e.expense_id,
+                e.amount,
+                e.description,
+                e.category,
+                DATE_FORMAT(e.expense_date, '%d/%m/%Y') as expense_date,
+                CONCAT(u.first_name, ' ', u.last_name) as mitra_name  -- Menggabungkan first_name dan last_name untuk nama mitra
+            FROM expenses e
+            JOIN users u ON e.mitra_id = u.user_id  -- Join dengan tabel users berdasarkan mitra_id
+            WHERE u.role = 'mitra' AND u.user_id = $mitra_id  -- Pastikan hanya mitra yang terambil
+            ORDER BY e.expense_date DESC"; // Menampilkan pengeluaran berdasarkan tanggal
+
+    // Menjalankan query dan mendapatkan hasilnya
+    $result = $conn->query($sql);
+
+    // Cek apakah ada hasil dari query
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC); // Mengembalikan data dalam bentuk array asosiatif
+    } else {
+        return []; // Jika tidak ada data, mengembalikan array kosong
+    }
+}
+
+// Fungsi untuk mendapatkan data pengeluaran berdasarkan ID
+function getExpenseById($expense_id) {
+    require '../databases/database.php';
+
+    // Query untuk mengambil data pengeluaran berdasarkan expense_id
+    $sql = "SELECT 
+                e.expense_id,
+                e.amount,
+                e.description,
+                e.category,
+                DATE_FORMAT(e.expense_date, '%d/%m/%Y') as expense_date,
+                CONCAT(u.first_name, ' ', u.last_name) as mitra_name
+            FROM expenses e
+            JOIN users u ON e.mitra_id = u.user_id
+            WHERE e.expense_id = ?"; // Pastikan kita mencari pengeluaran dengan expense_id yang diberikan
+
+    // Persiapkan dan eksekusi statement
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $expense_id); // Binding parameter
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Mengembalikan data pengeluaran jika ditemukan
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc(); // Mengembalikan data pengeluaran
+    } else {
+        return null; // Jika tidak ditemukan
+    }
+}
+
+// Fungsi untuk mendapatkan total pengeluaran berdasarkan mitra_id (user_id)
+function getTotalPenghasilanByMitraId($user_id) {
+    require '../databases/database.php';
+
+    // Query untuk menghitung total pengeluaran berdasarkan user_id
+    $sql = "SELECT 
+                SUM(e.amount) as total_amount
+            FROM expenses e
+            JOIN users u ON e.mitra_id = u.user_id
+            WHERE u.user_id = ?"; // Pastikan kita mencari pengeluaran dengan user_id yang diberikan
+
+    // Persiapkan dan eksekusi statement
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id); // Binding parameter
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Mengembalikan total pengeluaran jika ditemukan
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['total_amount']; // Mengembalikan total pengeluaran
+    } else {
+        return 0; // Jika tidak ditemukan, kembalikan 0
+    }
+}
+
+
+
+// Fungsi untuk mendapatkan data pengeluaran
+function getExpenses() {
+require '../databases/database.php';
+
+$sql = "SELECT 
+        expense_id,
+        amount,
+        description,
+        category,
+        DATE_FORMAT(expense_date, '%d/%m/%Y') as expense_date
+        FROM expenses
+        ORDER BY expense_date DESC";
+
+$result = $conn->query($sql);
+
+return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+// Fungsi untuk menghitung total pengeluaran
+function countTotalExpenses() {
+    require '../databases/database.php';
+
+    // Query untuk menghitung total pengeluaran
+    $sql = "SELECT SUM(amount) as total_pengeluaran FROM expenses";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['total_pengeluaran'] ?: 0; // Mengembalikan 0 jika null
+    } else {
+        return 0; // Jika tidak ada data, kembalikan 0
+    }
+}
+
+// Fungsi untuk menghitung rekap keuangan (pendapatan - pengeluaran)
+function getFinancialRecap() {
+    $totalEarnings = countTotalEarnings(); // Pastikan fungsi ini ada dan benar
+    $totalExpenses = countTotalExpenses();
+
+    return [
+        'total_earnings' => $totalEarnings,
+        'total_expenses' => $totalExpenses,
+        'balance' => $totalEarnings - $totalExpenses
+    ];
+}
+
+
+// Fungsi untuk menambahkan pengeluaran
+function addExpense($description, $category, $amount, $expense_date, $mitra_id) {
+    global $conn;
+
+    // Pastikan semua input valid
+    $description = mysqli_real_escape_string($conn, $description);
+    $category = mysqli_real_escape_string($conn, $category);
+    $amount = mysqli_real_escape_string($conn, $amount);
+    $expense_date = mysqli_real_escape_string($conn, $expense_date);
+    $mitra_id = mysqli_real_escape_string($conn, $mitra_id);
+
+    // Query untuk menambahkan pengeluaran
+    $sql = "INSERT INTO expenses (description, category, amount, expense_date, mitra_id) 
+            VALUES ('$description', '$category', '$amount', '$expense_date', '$mitra_id')";
+
+    if ($conn->query($sql) === TRUE) {
+        return "Pengeluaran berhasil ditambahkan!";
+    } else {
+        return "Terjadi kesalahan saat menambahkan pengeluaran: " . $conn->error;
+    }
+}
+
+// Fungsi untuk menghapus pengeluaran
+function deleteExpense($expense_id) {
+    require '../databases/database.php';
+
+    // Query untuk menghapus pengeluaran berdasarkan ID
+    $sql = "DELETE FROM expenses WHERE expense_id = ?";
+
+    // Persiapkan statement untuk menghindari SQL injection
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $expense_id);
+    
+    // Eksekusi query
+    if ($stmt->execute()) {
+        return "Pengeluaran berhasil dihapus.";
+    } else {
+        return "Gagal menghapus pengeluaran.";
+    }
+}
+
 
 // ========================================
 //          LANDING PAGE FUNCTION
@@ -749,6 +949,37 @@ function getMitraWorkshopsList($mitra_id) {
     $stmt->execute();
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
+
+
+// Fungsi untuk mengambil data mitra dari database
+function getDataMitra() {
+    // Menghubungkan ke database
+    require '../databases/database.php';
+
+    // Query untuk mengambil data mitra dengan role 'mitra'
+    $sql = "SELECT user_id, first_name, last_name, email, phone FROM users WHERE role = 'mitra' ORDER BY first_name ASC";
+    
+    // Menjalankan query
+    $result = $conn->query($sql);
+
+    // Mengambil hasil query dan menyimpannya dalam array
+    $mitraData = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Menyimpan setiap data mitra ke dalam array
+            $mitraData[] = [
+                'mitra_id' => $row['user_id'],
+                'name' => $row['first_name'] . ' ' . $row['last_name'],  // Menggabungkan nama depan dan belakang
+                'email' => $row['email'],
+                'phone' => $row['phone']
+            ];
+        }
+    }
+
+    // Mengembalikan data mitra
+    return $mitraData;
+}
+
 
 
 // ====================================================================

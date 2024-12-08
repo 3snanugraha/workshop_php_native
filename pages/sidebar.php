@@ -75,12 +75,12 @@
           </a>
         </li> -->
 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link collapsed" href="kalender.php">
             <i class="bi bi-calendar3"></i>
             <span>Kalender</span>
           </a>
-        </li>
+        </li> -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="pesan.php">
@@ -166,13 +166,20 @@
                     </li>
                   </ul>
                 </li>
-        
+
                 <li class="nav-item">
+                  <a class="nav-link collapsed" href="data-keuangan.php">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>Keuangan</span>
+                  </a>
+                </li>
+        
+                <!-- <li class="nav-item">
                   <a class="nav-link collapsed" href="kalender.php">
                     <i class="bi bi-calendar3"></i>
                     <span>Kalender</span>
                   </a>
-                </li>
+                </li> -->
         
                 <li class="nav-item">
                   <a class="nav-link collapsed" href="pesan.php">
