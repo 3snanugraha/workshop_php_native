@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2024 at 07:46 PM
+-- Generation Time: Dec 08, 2024 at 09:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -59,13 +59,6 @@ CREATE TABLE `chats` (
   `sent_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `chats`
---
-
-INSERT INTO `chats` (`chat_id`, `sender_id`, `receiver_id`, `message`, `is_read`, `sent_at`) VALUES
-(1, 59, 23, 'Halo, saya tertarik dengan workshop: Video Editing Mastery. Boleh tanya informasi lebih lanjut?', 1, '2024-12-08 18:42:47');
-
 -- --------------------------------------------------------
 
 --
@@ -83,14 +76,6 @@ CREATE TABLE `expenses` (
   `mitra_id` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `expenses`
---
-
-INSERT INTO `expenses` (`expense_id`, `amount`, `description`, `category`, `expense_date`, `created_at`, `updated_at`, `mitra_id`) VALUES
-(3, 250000.00, 'Transfer Untuk Mitra Sevema', 'Transfer Mitra', '2024-12-09', '2024-12-08 17:32:27', '2024-12-08 17:32:27', '50'),
-(4, 550000.00, 'Transfer Untuk Mitra Pertama', 'Transfer', '2024-12-09', '2024-12-08 18:45:09', '2024-12-08 18:45:09', '23');
-
 -- --------------------------------------------------------
 
 --
@@ -105,15 +90,6 @@ CREATE TABLE `feedback` (
   `comment` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `feedback`
---
-
-INSERT INTO `feedback` (`feedback_id`, `user_id`, `workshop_id`, `rating`, `comment`, `created_at`) VALUES
-(3, 25, 15, 5, 'Good', '2024-11-18 23:46:45'),
-(4, 25, 14, 5, 'Sangat bagus', '2024-11-18 23:46:55'),
-(5, 45, 15, 5, 'gftftgy', '2024-11-21 03:54:48');
 
 -- --------------------------------------------------------
 
@@ -146,14 +122,6 @@ CREATE TABLE `payments` (
   `bank_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `payments`
---
-
-INSERT INTO `payments` (`payment_id`, `registration_id`, `amount`, `payment_date`, `payment_method`, `payment_status`, `payment_receipt`, `bank_id`) VALUES
-(1, 1, 300000.00, '2024-12-09 00:04:26', 'bank_transfer', 'successful', 'INV-1.jpg', 1),
-(2, 2, 600000.00, '2024-12-09 01:43:00', 'bank_transfer', 'successful', 'INV-2.jpg', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -169,14 +137,6 @@ CREATE TABLE `registrations` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `registrations`
---
-
-INSERT INTO `registrations` (`registration_id`, `user_id`, `workshop_id`, `registration_date`, `status`, `created_at`, `updated_at`) VALUES
-(1, 59, 18, '2024-12-09 00:04:26', 'registered', '2024-12-08 17:04:26', '2024-12-08 17:04:26'),
-(2, 59, 14, '2024-12-09 01:43:00', 'registered', '2024-12-08 18:43:00', '2024-12-08 18:43:00');
 
 -- --------------------------------------------------------
 
@@ -264,8 +224,7 @@ INSERT INTO `workshops` (`workshop_id`, `mitra_id`, `title`, `description`, `ban
 (13, 23, 'Creative Writing Workshop', 'Pelatihan menulis kreatif untuk mengembangkan keterampilan menulis.', 'sample.jpg', 'Teknik menulis naratif, pengembangan karakter, dan struktur cerita.', 'Penulisan kreatif, storytelling, karakterisasi', '2 hari (6 jam/hari)', 'Laptop atau buku catatan', 'Sertifikat dan akses ke forum menulis', 250000.00, 'Bali', '2025-02-01 08:00:00', '2025-02-02 14:00:00', 'active', '2024-11-17 02:03:30', '2024-11-17 13:02:45'),
 (14, 23, 'Video Editing Mastery', 'Pelatihan untuk menjadi editor video profesional menggunakan Adobe Premiere.', 'sample.jpg', 'Dasar-dasar pengeditan video, efek, dan audio mastering.', 'Adobe Premiere, Final Cut Pro, editing video', '3 hari (7 jam/hari)', 'Laptop dengan Adobe Premiere', 'Sertifikat, video editan, dan akses ke komunitas editing', 600000.00, 'Yogyakarta', '2025-02-10 09:00:00', '2025-02-12 16:00:00', 'active', '2024-11-17 02:03:40', '2024-11-17 13:02:55'),
 (15, 23, 'Introduction to Machine Learning', 'Pelatihan pengantar machine learning untuk pemula.', 'sample.jpg', 'Algoritma dasar machine learning, Python, dan data preprocessing.', 'Machine learning, Python, Scikit-learn', '2 hari (8 jam/hari)', 'Laptop dengan Python dan Jupyter Notebook', 'Sertifikat dan akses ke dataset', 550000.00, 'Semarang', '2025-02-15 09:00:00', '2025-02-16 16:00:00', 'active', '2024-11-17 02:03:50', '2024-11-17 13:03:05'),
-(18, 50, 'Boosting Productivity with Effective Time Management', 'Workshop ini dirancang untuk membantu Anda mengelola waktu secara lebih efektif, meningkatkan produktivitas, dan mencapai tujuan dengan strategi yang teruji. Pelatihan ini sangat cocok untuk profesional, mahasiswa, atau siapa saja yang merasa kesulitan membagi waktu untuk berbagai tanggung jawab.', 'sample.jpg', 'Introduction to Time Management: Mengapa manajemen waktu penting?\r\nGoal Setting Strategies: Menentukan tujuan yang SMART (Specific, Measurable, Achievable, Relevant, Time-bound).\r\nTime Management Tools: Mengenal berbagai aplikasi dan metode manajemen waktu.\r\nPrioritization Techniques: Teknik Eisenhower Matrix dan prinsip Pareto untuk memprioritaskan tugas.\r\nOvercoming Procrastination: Tips mengatasi kebiasaan menunda pekerjaan.', 'Memahami prinsip-prinsip manajemen waktu.\r\nMampu menyusun jadwal harian/pekanan dengan efisien.\r\nMeningkatkan fokus dan mengurangi distraksi.\r\nMenggunakan alat bantu manajemen waktu secara optimal.\r\nMengembangkan kebiasaan yang mendukung produktivitas jangka panjang.', 'Session 1: Introduction to Time Management Durasi: 1 Jam Materi: Mengidentifikasi hambatan waktu dan pentingnya manajemen waktu.  Session 2: Tools and Techniques Durasi: 2 Jam Materi: Penjelasan alat bantu dan metode prioritas tugas.  Session 3: Overcoming Procrastination Durasi: 1,5 Jam Materi: Cara mengatasi penundaan menggunakan pendekatan psikologis dan praktis.  Session 4: Action Plan Durasi: 1 Jam Materi: Membuat rencana aksi untuk implementasi strategi manajemen waktu.', 'Peserta diharapkan membawa laptop atau notebook untuk sesi latihan.\r\nAplikasi yang harus diinstal sebelum workshop: Trello dan Google Calendar.\r\nKoneksi internet stabil (untuk sesi online).\r\n', 'Sertifikat digital sebagai bukti keikutsertaan.\r\nAkses gratis ke e-book tentang manajemen waktu.\r\nTemplate jadwal harian/pekanan yang dapat digunakan langsung.\r\nDiskon 15% untuk workshop selanjutnya di kategori pengembangan diri.\r\nNetworking dengan peserta lain dari berbagai latar belakang.', 300000.00, 'Politeknik Negeri Jember', '2024-12-16 08:00:00', '2024-12-20 03:00:00', 'active', '2024-11-26 07:49:58', '2024-12-08 17:21:40'),
-(20, 50, 'test', 'test', 'WS-1733681098.jpg', 'test', 'test', 'test', 'test', 'test', 20000.00, 'test', '2024-12-09 01:06:00', '2024-12-09 06:09:00', 'active', '2024-12-08 18:04:58', '2024-12-08 18:04:58');
+(18, 50, 'Boosting Productivity with Effective Time Management', 'Workshop ini dirancang untuk membantu Anda mengelola waktu secara lebih efektif, meningkatkan produktivitas, dan mencapai tujuan dengan strategi yang teruji. Pelatihan ini sangat cocok untuk profesional, mahasiswa, atau siapa saja yang merasa kesulitan membagi waktu untuk berbagai tanggung jawab.', 'sample.jpg', 'Introduction to Time Management: Mengapa manajemen waktu penting?\r\nGoal Setting Strategies: Menentukan tujuan yang SMART (Specific, Measurable, Achievable, Relevant, Time-bound).\r\nTime Management Tools: Mengenal berbagai aplikasi dan metode manajemen waktu.\r\nPrioritization Techniques: Teknik Eisenhower Matrix dan prinsip Pareto untuk memprioritaskan tugas.\r\nOvercoming Procrastination: Tips mengatasi kebiasaan menunda pekerjaan.', 'Memahami prinsip-prinsip manajemen waktu.\r\nMampu menyusun jadwal harian/pekanan dengan efisien.\r\nMeningkatkan fokus dan mengurangi distraksi.\r\nMenggunakan alat bantu manajemen waktu secara optimal.\r\nMengembangkan kebiasaan yang mendukung produktivitas jangka panjang.', 'Session 1: Introduction to Time Management Durasi: 1 Jam Materi: Mengidentifikasi hambatan waktu dan pentingnya manajemen waktu.  Session 2: Tools and Techniques Durasi: 2 Jam Materi: Penjelasan alat bantu dan metode prioritas tugas.  Session 3: Overcoming Procrastination Durasi: 1,5 Jam Materi: Cara mengatasi penundaan menggunakan pendekatan psikologis dan praktis.  Session 4: Action Plan Durasi: 1 Jam Materi: Membuat rencana aksi untuk implementasi strategi manajemen waktu.', 'Peserta diharapkan membawa laptop atau notebook untuk sesi latihan.\r\nAplikasi yang harus diinstal sebelum workshop: Trello dan Google Calendar.\r\nKoneksi internet stabil (untuk sesi online).\r\n', 'Sertifikat digital sebagai bukti keikutsertaan.\r\nAkses gratis ke e-book tentang manajemen waktu.\r\nTemplate jadwal harian/pekanan yang dapat digunakan langsung.\r\nDiskon 15% untuk workshop selanjutnya di kategori pengembangan diri.\r\nNetworking dengan peserta lain dari berbagai latar belakang.', 300000.00, 'Politeknik Negeri Jember', '2024-12-16 08:00:00', '2024-12-20 03:00:00', 'active', '2024-11-26 07:49:58', '2024-12-08 17:21:40');
 
 -- --------------------------------------------------------
 
