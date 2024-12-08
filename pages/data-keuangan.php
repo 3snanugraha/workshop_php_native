@@ -78,11 +78,30 @@ $isMitra = ($_SESSION['role'] == 'mitra');
         <div class="col-lg-12">
           <div class="row">
         
+
+          <!-- Penghasilan Card -->
+          <div class="col-xxl-12 col-md-12">
+            <div class="card info-card revenue-card">
+              <div class="card-body">
+                <h5 class="card-title">Est. Penghasilan (Semua Workshop)</h5>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-currency-dollar"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>Rp. <?php echo number_format($penghasilan['total_earnings']); ?></h6>
+                    <span class="text-muted small pt-2">Total Penghasilan</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
             <!-- Penghasilan Card -->
             <div class="col-xxl-6 col-md-6">
               <div class="card info-card revenue-card">
                 <div class="card-body">
-                  <h5 class="card-title">Penghasilan</h5>
+                  <h5 class="card-title">Total Penghasilan</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-currency-dollar"></i>

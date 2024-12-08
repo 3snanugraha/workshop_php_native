@@ -919,71 +919,90 @@ ini_set('display_errors', 1);
   <!-- Main JS File -->
   <script src="landingpage/assets/js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const workshopCards = document.querySelectorAll('.workshop-card');
-      const searchInput = document.getElementById('workshopSearch');
-      const filterButtons = document.querySelectorAll('.filter-buttons .btn');
+document.addEventListener('DOMContentLoaded', function() {
+  const workshopCards = document.querySelectorAll('.workshop-card');
+  const searchInput = document.getElementById('workshopSearch');
+  const filterButtons = document.querySelectorAll('.filter-buttons .btn');
 
-      // Live Search Function
-      searchInput.addEventListener('input', function() {
-          const searchTerm = this.value.toLowerCase();
+  // Live Search Function
+  searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      workshopCards.forEach(card => {
+          const title = card.querySelector('.card-title').textContent.toLowerCase();
+          const description = card.querySelector('.card-text').textContent.toLowerCase();
+          const location = card.querySelector('.info-item:nth-child(2)').textContent.toLowerCase();
           
-          workshopCards.forEach(card => {
-              const title = card.querySelector('.card-title').textContent.toLowerCase();
-              const description = card.querySelector('.card-text').textContent.toLowerCase();
-              const location = card.querySelector('.info-item:nth-child(2)').textContent.toLowerCase();
-              
-              const matches = title.includes(searchTerm) || 
-                            description.includes(searchTerm) || 
-                            location.includes(searchTerm);
-              
-              card.closest('.col-lg-4').style.display = matches ? 'block' : 'none';
-          });
-      });
-
-      // Filter Buttons
-      filterButtons.forEach(button => {
-          button.addEventListener('click', function() {
-              filterButtons.forEach(btn => btn.classList.remove('active'));
-              this.classList.add('active');
-              
-              const filter = this.textContent.trim();
-              const cardArray = Array.from(workshopCards);
-              
-              switch(filter) {
-                  case 'Semua':
-                      workshopCards.forEach(card => {
-                          card.closest('.col-lg-4').style.display = 'block';
-                      });
-                      break;
-                      
-                  case 'Terbaru':
-                      // Sort by most recent workshops
-                      cardArray.sort((a, b) => {
-                          const dateA = new Date(a.querySelector('.info-item:first-child span').textContent);
-                          const dateB = new Date(b.querySelector('.info-item:first-child span').textContent);
-                          return dateB - dateA;
-                      });
-                      
-                      workshopCards.forEach(card => {
-                          card.closest('.col-lg-4').style.display = 'none';
-                      });
-                      
-                      cardArray.slice(0, 2).forEach(card => {
-                          card.closest('.col-lg-4').style.display = 'block';
-                      });
-                      break;
-                      
-                  case 'Best Seller':
-                      // Show random selection for now
-                      workshopCards.forEach(card => {
-                          card.closest('.col-lg-4').style.display = Math.random() > 0.5 ? 'block' : 'none';
-                      });
-                      break;
-              }
-          });
+          const matches = title.includes(searchTerm) || 
+                        description.includes(searchTerm) || 
+                        location.includes(searchTerm);
+          
+          card.closest('.col-lg-4').style.display = matches ? 'block' : 'none';
       });
   });
+
+  // Filter Buttons
+  filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          const filter = this.textContent.trim();
+          const cardArray = Array.from(workshopCards);
+          
+          switch(filter) {
+              case 'Semua':
+                  workshopCards.forEach(card => {
+                      card.closest('.col-lg-4').style.display = 'block';
+                  });
+                  break;
+              
+              case 'Terbaru':
+                  // Sort by most recent workshops
+                  cardArray.sort((a, b) => {
+                      const dateA = new Date(a.querySelector('.info-item:first-child span').textContent);
+                      const dateB = new Date(b.querySelector('.info-item:first-child span').textContent);
+                      return dateB - dateA;
+                  });
+                  
+                  workshopCards.forEach(card => {
+                      card.closest('.col-lg-4').style.display = 'none';
+                  });
+                  
+                  cardArray.slice(0, 2).forEach(card => {
+                      card.closest('.col-lg-4').style.display = 'block';
+                  });
+                  break;
+              
+              case 'Best Seller':
+                  // Sort by rating and number of participants
+                  cardArray.sort((a, b) => {
+                      const participantsA = parseInt(a.querySelector('.participants-count').textContent.replace(/[^\d]/g, ''));
+                      const participantsB = parseInt(b.querySelector('.participants-count').textContent.replace(/[^\d]/g, ''));
+                      const ratingA = parseFloat(a.querySelector('.rating-wrapper .text-muted').textContent);
+                      const ratingB = parseFloat(b.querySelector('.rating-wrapper .text-muted').textContent);
+                      
+                      // First, sort by number of participants (more participants is better)
+                      if (participantsB !== participantsA) {
+                          return participantsB - participantsA;
+                      }
+                      // Then, sort by rating (higher rating is better)
+                      return ratingB - ratingA;
+                  });
+
+                  workshopCards.forEach(card => {
+                      card.closest('.col-lg-4').style.display = 'none';
+                  });
+
+                  cardArray.slice(0, 3).forEach(card => {
+                      card.closest('.col-lg-4').style.display = 'block';
+                  });
+                  break;
+          }
+      });
+  });
+});
+
   </script>
 </body>
 

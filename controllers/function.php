@@ -483,8 +483,6 @@ function getTotalPenghasilanByMitraId($user_id) {
     }
 }
 
-
-
 // Fungsi untuk mendapatkan data pengeluaran
 function getExpenses() {
 require '../databases/database.php';
