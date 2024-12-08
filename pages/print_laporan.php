@@ -93,6 +93,46 @@ if (!empty($kategori)) {
             }
             $headers = ['ID Registrasi', 'Nama Peserta', 'Workshop', 'Harga Workshop', 'Jumlah Bayar', 'Metode Pembayaran', 'Status Pembayaran', 'Tanggal Pembayaran', 'Status Registrasi'];
             break;
+
+            case 'Pengeluaran':
+                if($role == 'mitra') {
+                    $query = "SELECT 
+                        e.expense_id,
+                        e.description AS deskripsi_pengeluaran,
+                        e.category AS kategori_pengeluaran,
+                        e.amount AS jumlah_pengeluaran,
+                        DATE_FORMAT(e.expense_date, '%d/%m/%Y') AS tanggal_pengeluaran
+                        FROM expenses e
+                        WHERE e.mitra_id = $user_id
+                        AND DATE(e.expense_date) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+                } else {
+                    $query = "SELECT 
+                        e.expense_id,
+                        CONCAT(u.first_name, ' ', u.last_name) AS nama_lengkap,                        
+                        e.description AS deskripsi_pengeluaran,
+                        e.category AS kategori_pengeluaran,
+                        e.amount AS jumlah_pengeluaran,
+                        DATE_FORMAT(e.expense_date, '%d/%m/%Y') AS tanggal_pengeluaran
+                        FROM expenses e JOIN users u ON e.mitra_id = u.user_id
+                        WHERE DATE(e.expense_date) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+                }
+                $headers = ['ID Pengeluaran', 'Nama Mitra', 'Deskripsi Pengeluaran', 'Kategori Pengeluaran', 'Jumlah Pengeluaran', 'Tanggal Pengeluaran'];
+                break;
+
+                case 'Pemasukan':
+                    if($role == 'mitra') {
+                        $query = "SELECT 
+                            e.expense_id,
+                            e.description AS deskripsi_pengeluaran,
+                            e.category AS kategori_pengeluaran,
+                            e.amount AS jumlah_pengeluaran,
+                            DATE_FORMAT(e.expense_date, '%d/%m/%Y') AS tanggal_pengeluaran
+                            FROM expenses e
+                            WHERE e.mitra_id = $user_id
+                            AND DATE(e.expense_date) BETWEEN '$formatted_start_date' AND '$formatted_end_date'";
+                    }
+                    $headers = ['ID Pengeluaran', 'Deskripsi Pemasukan', 'Kategori Pemasukan', 'Jumlah Pemasukan', 'Tanggal Pemasukan'];
+                    break;
     }
 }
 

@@ -65,6 +65,11 @@
                 <i class="bi bi-circle"></i><span>Peserta</span>
               </a>
             </li>
+            <li>
+              <a href="laporan.php?kategori=Pengeluaran">
+                <i class="bi bi-circle"></i><span>Pengeluaran</span>
+              </a>
+            </li>
           </ul>
         </li>
 
@@ -162,6 +167,11 @@
                     <li>
                       <a href="laporan.php?kategori=Keuangan">
                         <i class="bi bi-circle"></i><span>Keuangan</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="laporan.php?kategori=Pemasukan">
+                        <i class="bi bi-circle"></i><span>Pemasukan</span>
                       </a>
                     </li>
                   </ul>
