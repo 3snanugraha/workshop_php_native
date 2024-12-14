@@ -12,3 +12,16 @@ Revisi Admin
 6.	Menambahkan fitur transaksi yang akan disambungkan dengan aksi tansaksi yang terdapat di data pengeluaran (digunakan sebagai tempat transaksi antara admin dan mitra) 
 [DONE] Note : Menu baru mitra -> Transaksi
 Ket: penambahan fitur transaksi digunakan untuk transfer/membagi hasil ke mitra yang masuk ke data pengeluaran pada fitur keuangan. Penghasilan didapat dari peserta yang sudah daftar workshop milik mitra (otomatis masuk ke admin dulu), sedangkan pengeluaran yaitu dari admin yang kemudian akan ditransfer ke mitra sebagai bagi hasil antara mitra dan admin. Jadi diperlukan fitur tambahan yaitu fitur transaksi
+
+Revisi User
+1. Penambahan fitur isPurchased() untuk mengecek status pembelian workshop oleh user
+[DONE] Note: Menampilkan badge "Sudah Dibeli (Nx)" pada workshop yang telah dibeli user
+
+2. Penambahan card statistik user di dashboard:
+- Total Workshop yang sudah diikuti
+- Total Pembayaran yang sudah dilakukan
+[DONE] Note: Menampilkan ringkasan aktivitas user
+
+Revisi Mitra
+1. Penambahan halaman Data Feedback untuk melihat ulasan workshop
+[DONE] Note: Mitra dapat melihat dan menganalisis feedback dari peserta workshop mereka
