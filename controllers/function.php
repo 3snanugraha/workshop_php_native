@@ -530,7 +530,6 @@ function getFinancialRecap() {
     ];
 }
 
-
 // Fungsi untuk menambahkan pengeluaran
 function addExpense($description, $category, $amount, $expense_date, $mitra_id) {
     global $conn;
@@ -570,6 +569,55 @@ function deleteExpense($expense_id) {
     } else {
         return "Gagal menghapus pengeluaran.";
     }
+}
+
+// Get Total Workshop User
+function getTotalWorkshopsJoined($user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT COUNT(DISTINCT r.workshop_id) as total_workshops
+            FROM registrations r
+            JOIN payments p ON r.registration_id = p.registration_id
+            WHERE r.user_id = ? 
+            AND p.payment_status = 'successful'";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total_workshops'];
+}
+
+// Get total Payments user
+function getTotalPaymentsMade($user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT COUNT(p.payment_id) as total_payments, 
+            SUM(p.amount) as total_amount
+            FROM payments p
+            JOIN registrations r ON p.registration_id = r.registration_id
+            WHERE r.user_id = ? 
+            AND p.payment_status = 'successful'";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function getWorkshopRatingsbyUser() {
+    require '../databases/database.php';
+    
+    $sql = "SELECT f.*, 
+            w.title as workshop_title,
+            CONCAT(u.first_name, ' ', u.last_name) as user_name,
+            w.mitra_id
+            FROM feedback f
+            JOIN workshops w ON f.workshop_id = w.workshop_id 
+            JOIN users u ON f.user_id = u.user_id
+            ORDER BY f.created_at DESC";
+            
+    $result = $conn->query($sql);
+    return ($result->num_rows > 0) ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
 
@@ -626,6 +674,95 @@ function getWorkshopsWithMitra() {
         return "Error fetching workshops: " . mysqli_error($conn);
     }
 }
+
+function getWorkshopsWithFilter($sql) {
+    require '../databases/database.php';
+    
+    $result = $conn->query($sql);
+    if ($result) {
+        $workshops = [];
+        while($row = $result->fetch_assoc()) {
+            $workshops[] = $row;
+        }
+        return $workshops;
+    }
+    return [];
+}
+
+function isPurchased($workshop_id, $user_id) {
+    require '../databases/database.php';
+    
+    $sql = "SELECT 
+            COUNT(r.registration_id) as purchase_count,
+            MAX(p.payment_status) as payment_status
+            FROM registrations r
+            JOIN payments p ON r.registration_id = p.registration_id
+            WHERE r.workshop_id = ? 
+            AND r.user_id = ?
+            AND p.payment_status = 'successful'";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $workshop_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    
+    return [
+        'is_purchased' => $result['purchase_count'] > 0,
+        'purchase_count' => $result['purchase_count'],
+        'payment_status' => $result['payment_status']
+    ];
+}
+
+
+function getWorkshopsWithMitraPagination($page = 1, $limit = 6) {
+    require '../databases/database.php';
+    
+    // Calculate offset
+    $offset = ($page - 1) * $limit;
+    
+    // Get total records for pagination
+    $count_query = "SELECT COUNT(*) as total FROM workshops w 
+                   LEFT JOIN users m ON w.mitra_id = m.user_id 
+                   WHERE m.role = 'mitra' AND w.status = 'active'";
+    $count_result = mysqli_query($conn, $count_query);
+    $total_records = mysqli_fetch_assoc($count_result)['total'];
+    
+    // Main query with LIMIT and OFFSET
+    $query = "SELECT 
+        w.workshop_id, w.title, w.description, w.banner, w.price,
+        w.location, w.start_date, w.end_date, w.status,
+        w.training_overview, w.trained_competencies, w.training_session,
+        w.requirements, w.benefits, m.user_id AS mitra_id,
+        m.first_name AS mitra_first_name, m.last_name AS mitra_last_name,
+        m.email AS mitra_email, m.phone AS mitra_phone,
+        DATEDIFF(w.end_date, w.start_date) + 1 AS duration_days,
+        AVG(f.rating) as average_rating,
+        COUNT(DISTINCT f.feedback_id) as total_reviews,
+        COUNT(DISTINCT r.registration_id) as total_participants,
+        GROUP_CONCAT(DISTINCT CONCAT(u.first_name, ' ', u.last_name)) as reviewer_names,
+        GROUP_CONCAT(DISTINCT f.comment) as review_comments
+        FROM workshops w
+        LEFT JOIN users m ON w.mitra_id = m.user_id
+        LEFT JOIN feedback f ON w.workshop_id = f.workshop_id
+        LEFT JOIN users u ON f.user_id = u.user_id
+        LEFT JOIN registrations r ON w.workshop_id = r.workshop_id
+        WHERE m.role = 'mitra' AND w.status = 'active'
+        GROUP BY w.workshop_id
+        ORDER BY w.created_at DESC
+        LIMIT ? OFFSET ?";
+
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "ii", $limit, $offset);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    return [
+        'workshops' => mysqli_fetch_all($result, MYSQLI_ASSOC),
+        'total_pages' => ceil($total_records / $limit),
+        'current_page' => $page
+    ];
+}
+
 
 // ========================================
 //          SESSION FUNCTION

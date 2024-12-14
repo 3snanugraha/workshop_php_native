@@ -400,11 +400,28 @@ ini_set('display_errors', 1);
                           </div>
                       </div>
                       <div class="action-buttons mt-3 text-center">
-                          <button class="btn btn-outline-primary rounded-pill animate-pulse" data-bs-toggle="modal" data-bs-target="#workshopModal<?= $workshop['workshop_id'] ?>" onmouseover="this.classList.add('btn-glow')" onmouseout="this.classList.remove('btn-glow')">
-                              <i class="bi bi-eye me-2"></i>Lihat Workshop
-                          </button>
+                            <?php if($isLogin && $_SESSION['role'] == 'user'): 
+                            $purchaseStatus = isPurchased($workshop['workshop_id'], $_SESSION['user_id']);
+                            if($purchaseStatus['is_purchased']): ?>
+                                <a href="detail-workshop.php?workshop_id=<?= $workshop['workshop_id'] ?>" class="btn btn-outline-primary rounded-pill animate-pulse" onmouseover="this.classList.add('btn-glow')" onmouseout="this.classList.remove('btn-glow')">
+                                    <i class="bi bi-cart-plus me-2"></i>Beli Lagi
+                                </a>
+                                <div class="purchase-badge bg-info rounded-pill text-white mt-2">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Sudah Dibeli (<?= $purchaseStatus['purchase_count'] ?>x)
+                                </div>
+                            <?php else: ?>
+                                <button class="btn btn-outline-primary rounded-pill animate-pulse" data-bs-toggle="modal" data-bs-target="#workshopModal<?= $workshop['workshop_id'] ?>" onmouseover="this.classList.add('btn-glow')" onmouseout="this.classList.remove('btn-glow')">
+                                    <i class="bi bi-eye me-2"></i>Lihat Workshop
+                                </button>
+                            <?php endif; 
+                            else: ?>
+                                <button class="btn btn-outline-primary rounded-pill animate-pulse" data-bs-toggle="modal" data-bs-target="#workshopModal<?= $workshop['workshop_id'] ?>" onmouseover="this.classList.add('btn-glow')" onmouseout="this.classList.remove('btn-glow')">
+                                    <i class="bi bi-eye me-2"></i>Lihat Workshop
+                                </button>
+                            <?php endif; ?>
+                        </div>                  
                       </div>
-                  </div>
               </div>
           </div>
 
@@ -598,21 +615,29 @@ ini_set('display_errors', 1);
 
         <!-- Enhanced Pagination -->
         <nav class="mt-5" aria-label="Workshop navigation">
-          <ul class="pagination pagination-rounded justify-content-center">
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Previous" id="prevPage">
-                <i class="bi bi-chevron-left"></i>
-              </a>
-            </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Next" id="nextPage">
-                <i class="bi bi-chevron-right"></i>
-              </a>
-            </li>
-          </ul>
+            <ul class="pagination pagination-rounded justify-content-center">
+                <?php if($workshops_data['current_page'] > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?= $workshops_data['current_page']-1 ?>#workshops" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+                
+                <?php for($i = 1; $i <= $workshops_data['total_pages']; $i++): ?>
+                <li class="page-item <?= $i == $workshops_data['current_page'] ? 'active' : '' ?>">
+                    <a class="page-link" href="?page=<?= $i ?>#workshops"><?= $i ?></a>
+                </li>
+                <?php endfor; ?>
+                
+                <?php if($workshops_data['current_page'] < $workshops_data['total_pages']): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?= $workshops_data['current_page']+1 ?>#workshops" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
         </nav>
 
       </div>
@@ -919,91 +944,129 @@ ini_set('display_errors', 1);
   <!-- Main JS File -->
   <script src="landingpage/assets/js/main.js"></script>
   <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const workshopCards = document.querySelectorAll('.workshop-card');
+document.addEventListener('DOMContentLoaded', function () {
+  const workshopCards = Array.from(document.querySelectorAll('.workshop-card'));
   const searchInput = document.getElementById('workshopSearch');
   const filterButtons = document.querySelectorAll('.filter-buttons .btn');
+  const itemsPerPage = 6;
+  let currentPage = 1;
+  let filteredWorkshops = [...workshopCards];
 
   // Live Search Function
-  searchInput.addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase();
-      
-      workshopCards.forEach(card => {
-          const title = card.querySelector('.card-title').textContent.toLowerCase();
-          const description = card.querySelector('.card-text').textContent.toLowerCase();
-          const location = card.querySelector('.info-item:nth-child(2)').textContent.toLowerCase();
-          
-          const matches = title.includes(searchTerm) || 
-                        description.includes(searchTerm) || 
-                        location.includes(searchTerm);
-          
-          card.closest('.col-lg-4').style.display = matches ? 'block' : 'none';
-      });
+  searchInput.addEventListener('input', function () {
+    const searchTerm = this.value.toLowerCase();
+    filteredWorkshops = workshopCards.filter(card => {
+      const title = card.querySelector('.card-title').textContent.toLowerCase();
+      const description = card.querySelector('.card-text').textContent.toLowerCase();
+      const location = card.querySelector('.info-item:nth-child(2)').textContent.toLowerCase();
+      return title.includes(searchTerm) || description.includes(searchTerm) || location.includes(searchTerm);
+    });
+    currentPage = 1;
+    displayWorkshops();
   });
 
-  // Filter Buttons
+  // Filter Buttons Handler
   filterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          filterButtons.forEach(btn => btn.classList.remove('active'));
-          this.classList.add('active');
-          
-          const filter = this.textContent.trim();
-          const cardArray = Array.from(workshopCards);
-          
-          switch(filter) {
-              case 'Semua':
-                  workshopCards.forEach(card => {
-                      card.closest('.col-lg-4').style.display = 'block';
-                  });
-                  break;
-              
-              case 'Terbaru':
-                  // Sort by most recent workshops
-                  cardArray.sort((a, b) => {
-                      const dateA = new Date(a.querySelector('.info-item:first-child span').textContent);
-                      const dateB = new Date(b.querySelector('.info-item:first-child span').textContent);
-                      return dateB - dateA;
-                  });
-                  
-                  workshopCards.forEach(card => {
-                      card.closest('.col-lg-4').style.display = 'none';
-                  });
-                  
-                  cardArray.slice(0, 2).forEach(card => {
-                      card.closest('.col-lg-4').style.display = 'block';
-                  });
-                  break;
-              
-              case 'Best Seller':
-                  // Sort by rating and number of participants
-                  cardArray.sort((a, b) => {
-                      const participantsA = parseInt(a.querySelector('.participants-count').textContent.replace(/[^\d]/g, ''));
-                      const participantsB = parseInt(b.querySelector('.participants-count').textContent.replace(/[^\d]/g, ''));
-                      const ratingA = parseFloat(a.querySelector('.rating-wrapper .text-muted').textContent);
-                      const ratingB = parseFloat(b.querySelector('.rating-wrapper .text-muted').textContent);
-                      
-                      // First, sort by number of participants (more participants is better)
-                      if (participantsB !== participantsA) {
-                          return participantsB - participantsA;
-                      }
-                      // Then, sort by rating (higher rating is better)
-                      return ratingB - ratingA;
-                  });
+    button.addEventListener('click', function () {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
 
-                  workshopCards.forEach(card => {
-                      card.closest('.col-lg-4').style.display = 'none';
-                  });
-
-                  cardArray.slice(0, 3).forEach(card => {
-                      card.closest('.col-lg-4').style.display = 'block';
-                  });
-                  break;
-          }
-      });
+      const filter = this.textContent.trim();
+      filterWorkshops(filter);
+      currentPage = 1;
+      displayWorkshops();
+    });
   });
+
+  function filterWorkshops(filter) {
+    filteredWorkshops = workshopCards.filter(card => {
+      const rating = parseFloat(card.querySelector('.rating-stars .ms-2').textContent);
+      const participants = parseInt(card.querySelector('.participants-count').textContent.match(/\d+/)[0]);
+      const date = new Date(card.querySelector('.info-item:first-child span').textContent);
+
+      switch(filter) {
+        case 'Terbaru':
+          return date >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Last 30 days
+        case 'Best Seller':
+          return rating >= 4.5 || participants >= 10;
+        default: // 'Semua'
+          return true;
+      }
+    });
+  }
+
+  function displayWorkshops() {
+    const container = document.querySelector('.row.gy-4');
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedWorkshops = filteredWorkshops.slice(startIndex, endIndex);
+
+    // Hide all workshop cards
+    workshopCards.forEach(card => {
+      card.closest('.col-lg-4').style.display = 'none';
+    });
+
+    // Show only paginated workshops
+    paginatedWorkshops.forEach(card => {
+      card.closest('.col-lg-4').style.display = 'block';
+    });
+
+    updatePagination();
+  }
+
+  function updatePagination() {
+    const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
+    const paginationContainer = document.querySelector('.pagination');
+    let paginationHTML = '';
+
+    if (currentPage > 1) {
+      paginationHTML += `
+        <li class="page-item">
+          <a class="page-link" href="#workshops" data-page="${currentPage - 1}">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        </li>
+      `;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      paginationHTML += `
+        <li class="page-item ${i === currentPage ? 'active' : ''}">
+          <a class="page-link" href="#workshops" data-page="${i}">${i}</a>
+        </li>
+      `;
+    }
+
+    if (currentPage < totalPages) {
+      paginationHTML += `
+        <li class="page-item">
+          <a class="page-link" href="#workshops" data-page="${currentPage + 1}">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+      `;
+    }
+
+    paginationContainer.innerHTML = paginationHTML;
+
+    // Add click handlers for pagination
+    paginationContainer.querySelectorAll('.page-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        currentPage = parseInt(this.dataset.page);
+        displayWorkshops();
+      });
+    });
+  }
+
+  // Initial display
+  displayWorkshops();
 });
 
   </script>
+
+
+
 </body>
 
 </html>

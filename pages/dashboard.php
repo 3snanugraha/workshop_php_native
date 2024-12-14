@@ -69,18 +69,18 @@ $actualEarnings = getTotalPenghasilanByMitraId($_SESSION['user_id']);
 
   <main id="main" class="main brand-bg-color">
 
-    <div class="pagetitle">
-      <h1 class="text-light">Dashboard</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
+  <div class="pagetitle">
+    <h1 class="text-light">Dashboard</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
 
-    <?php require 'alert.php'; ?>
-<section class="section dashboard">
+  <?php require 'alert.php'; ?>
+  <section class="section dashboard">
       <!-- Dashboard untuk Admin -->
       <?php if($role=='admin'){ ?>
         <div class="row">
@@ -266,8 +266,60 @@ $actualEarnings = getTotalPenghasilanByMitraId($_SESSION['user_id']);
         </div>
       <?php }else if($role=='user'){ ?>
         <!-- Dashboard Untuk Peserta -->
+
+        <!-- Recap Data -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card info-card sales-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Workshop Diikuti</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-journal-check"></i>
+                            </div>
+                            <div class="ps-3">
+                                <h6><?= getTotalWorkshopsJoined($_SESSION['user_id']) ?> Workshop</h6>
+                                <span class="text-muted small pt-2">Total workshop yang diikuti</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card info-card revenue-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Pembayaran</h5>
+                        <?php $payments = getTotalPaymentsMade($_SESSION['user_id']); ?>
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="ps-3">
+                                <h6>Rp <?= number_format($payments['total_amount'], 0, ',', '.') ?></h6>
+                                <span class="text-muted small pt-2"><?= $payments['total_payments'] ?> transaksi berhasil</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+          <!-- Title Section -->
+          <hr class="text-white">
+          <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="text-white fw-bold">
+                    <i class="bi bi-lightbulb"></i> Ingin Mencari Workshop Lagi?
+                </h3>
+                <p class="text-white">
+                    Temukan berbagai workshop menarik yang sesuai dengan minat dan kebutuhanmu!
+                    <i class="bi bi-arrow-down-circle-fill"></i>
+                </p>
+            </div>
+        </div>
         <div class="row mb-3">
-            <div class="col-md-4">
+            <div class="col-md-12">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" id="searchWorkshop" placeholder="Cari workshop...">
@@ -441,7 +493,7 @@ $actualEarnings = getTotalPenghasilanByMitraId($_SESSION['user_id']);
             </div>
         </div>
       <?php } ?>
-    </section>  
+  </section>  
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->

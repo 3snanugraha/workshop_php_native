@@ -59,173 +59,174 @@ $workshops = getWorkshopByMitraId($_SESSION['user_id']);
     </div><!-- End Page Title -->
 
     <?php require 'alert.php'; ?>
-<section class="section dashboard">
-      <div class="row">
+    <section class="section dashboard">
+          <div class="row">
 
-        <!-- Full side columns -->
-        <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Data Workshop</h5>
-              <p class="text-dark">Berikut adalah daftar peserta yang terdaftar dalam sistem.</p>
-              <a href="#" data-bs-toggle="modal" data-bs-target="#tambahWorkshop" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-person-plus me-2"></i>Tambah Workshop</a>
-              <a href="#" onclick="location.reload();" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</a>              
-              
-            <!-- Fetch Data Workshop dari db -->
-            <div class="table-responsive">
-              <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
-              <thead>
-              <tr>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Banner</th>
-                  <th>Training Overview</th>
-                  <th>Competencies</th>
-                  <th>Session</th>
-                  <th>Requirements</th>
-                  <th>Benefits</th>
-                  <th>Price</th>
-                  <th>Location</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-              </tr>
-              </thead>
-              <tbody>
-              <?php
-              foreach($workshops as $workshop) {
-              ?>
-              <tr>
-                  <td><?= $workshop['title'] ?></td>
-                  <td><?= $workshop['description'] ?></td>
-                  <td><img src="assets/img/workshops/<?= $workshop['banner'] ?>" width="50"></td>
-                  <td><?= $workshop['training_overview'] ?></td>
-                  <td><?= $workshop['trained_competencies'] ?></td>
-                  <td><?= $workshop['training_session'] ?></td>
-                  <td><?= $workshop['requirements'] ?></td>
-                  <td><?= $workshop['benefits'] ?></td>
-                  <td>Rp <?= number_format($workshop['price'],0,',','.') ?></td>
-                  <td><?= $workshop['location'] ?></td>
-                  <td><?= date('d/m/Y', strtotime($workshop['start_date'])) ?></td>
-                  <td><?= date('d/m/Y', strtotime($workshop['end_date'])) ?></td>
-                  <td><?= $workshop['status'] ?></td>
-                  <td class="text-center">
-                  <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-sm btn-outline-warning me-1 rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal<?= $workshop['workshop_id'] ?>" title="Edit"><i class="bi bi-pencil-square"></i></button>
-                      <a onclick="return confirm('Are you sure you want to delete this workshop?')" href="../controllers/controller.php?deleteWorkshop=<?= $workshop['workshop_id'] ?>" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete"><i class="bi bi-trash"></i></a>
-                  </div>
-                  </td>
-              </tr>
+            <!-- Full side columns -->
+            <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Data Workshop</h5>
+                  <p class="text-dark">Berikut adalah daftar peserta yang terdaftar dalam sistem.</p>
+                  <a href="#" data-bs-toggle="modal" data-bs-target="#tambahWorkshop" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-person-plus me-2"></i>Tambah Workshop</a>
+                  <a href="#" onclick="location.reload();" class="brand-btn btn mt-2 mb-4 rounded-pill"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</a>              
+                  
+                <!-- Fetch Data Workshop dari db -->
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover dt-responsive nowrap" id="participantTable" style="width:100%">
+                  <thead>
+                  <tr>
+                      <th>Judul</th>
+                      <th>Deskripsi</th>
+                      <th>Banner</th>
+                      <th>Gambaran Pelatihan</th>
+                      <th>Kompetensi</th>
+                      <th>Sesi</th>
+                      <th>Persyaratan</th>
+                      <th>Manfaat</th>
+                      <th>Harga</th>
+                      <th>Lokasi</th>
+                      <th>Tanggal Mulai</th>
+                      <th>Tanggal Selesai</th>
+                      <th>Status</th>
+                      <th>Aksi</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <?php
+                  foreach($workshops as $workshop) {
+                  ?>
+                  <tr>
+                      <td><?= $workshop['title'] ?></td>
+                      <td><?= $workshop['description'] ?></td>
+                      <td><img src="assets/img/workshops/<?= $workshop['banner'] ?>" width="50"></td>
+                      <td><?= $workshop['training_overview'] ?></td>
+                      <td><?= $workshop['trained_competencies'] ?></td>
+                      <td><?= $workshop['training_session'] ?></td>
+                      <td><?= $workshop['requirements'] ?></td>
+                      <td><?= $workshop['benefits'] ?></td>
+                      <td>Rp <?= number_format($workshop['price'],0,',','.') ?></td>
+                      <td><?= $workshop['location'] ?></td>
+                      <td><?= date('d/m/Y', strtotime($workshop['start_date'])) ?></td>
+                      <td><?= date('d/m/Y', strtotime($workshop['end_date'])) ?></td>
+                      <td><?= $workshop['status'] ?></td>
+                      <td class="text-center">
+                      <div class="btn-group" role="group">
+                          <button type="button" class="btn btn-sm btn-outline-warning me-1 rounded-pill" data-bs-toggle="modal" data-bs-target="#editModal<?= $workshop['workshop_id'] ?>" title="Edit"><i class="bi bi-pencil-square"></i></button>
+                          <a onclick="return confirm('Apakah Anda yakin ingin menghapus workshop ini?')" href="../controllers/controller.php?deleteWorkshop=<?= $workshop['workshop_id'] ?>" class="btn btn-sm btn-outline-danger rounded-pill" title="Hapus"><i class="bi bi-trash"></i></a>
+                      </div>
+                      </td>
+                  </tr>
 
-              <!-- Modal for editing workshop -->
-              <div class="modal fade" id="editModal<?= $workshop['workshop_id'] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $workshop['workshop_id'] ?>" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered modal-lg">
-                      <div class="modal-content">
-                          <div class="modal-header brand-bg-color text-white">
-                              <h5 class="modal-title" id="editModalLabel<?= $workshop['workshop_id'] ?>"><i class="bi bi-pencil-square me-2"></i>Edit Workshop</h5>
-                              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                              <form action="../controllers/controller.php" method="POST" enctype="multipart/form-data">
-                                  <input type="hidden" name="workshop_id" value="<?= $workshop['workshop_id'] ?>">
-                                  <input type="hidden" name="old_banner" value="<?= $workshop['banner'] ?>">
-                                  <div class="mb-3">
-                                      <label for="title" class="form-label">Title</label>
-                                      <input type="text" class="form-control" id="title" name="title" value="<?= $workshop['title'] ?>" required>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="description" class="form-label">Description</label>
-                                      <textarea class="form-control" id="description" name="description" required><?= $workshop['description'] ?></textarea>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="banner" class="form-label">Banner</label>
-                                      <input type="file" class="form-control" id="banner" name="banner">
-                                      <small class="text-muted">Leave empty if you don't want to change the banner</small>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="training_overview" class="form-label">Training Overview</label>
-                                      <textarea class="form-control" id="training_overview" name="training_overview" required><?= $workshop['training_overview'] ?></textarea>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="trained_competencies" class="form-label">Competencies</label>
-                                      <textarea class="form-control" id="trained_competencies" name="trained_competencies" required><?= $workshop['trained_competencies'] ?></textarea>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="training_session" class="form-label">Session</label>
-                                      <input type="text" class="form-control" id="training_session" name="training_session" value="<?= $workshop['training_session'] ?>" required>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="requirements" class="form-label">Requirements</label>
-                                      <textarea class="form-control" id="requirements" name="requirements" required><?= $workshop['requirements'] ?></textarea>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="benefits" class="form-label">Benefits</label>
-                                      <textarea class="form-control" id="benefits" name="benefits" required><?= $workshop['benefits'] ?></textarea>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="price" class="form-label">Price</label>
-                                      <input type="number" class="form-control" id="price" name="price" value="<?= $workshop['price'] ?>" required>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="location" class="form-label">Location</label>
-                                      <input type="text" class="form-control" id="location" name="location" value="<?= $workshop['location'] ?>" required>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="start_date" class="form-label">Start Date</label>
-                                      <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="<?= date('Y-m-d\TH:i', strtotime($workshop['start_date'])) ?>" required>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="end_date" class="form-label">End Date</label>
-                                      <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="<?= date('Y-m-d\TH:i', strtotime($workshop['end_date'])) ?>" required>
-                                  </div>
-                                    
-                                  <div class="mb-3">
-                                      <label for="status" class="form-label">Status</label>
-                                      <select class="form-select" id="status" name="status" required>
-                                          <option value="active" <?= $workshop['status'] == 'active' ? 'selected' : '' ?>>Active</option>
-                                          <option value="inactive" <?= $workshop['status'] == 'inactive' ? 'selected' : '' ?>>Inactive</option>
-                                          <option value="cancelled" <?= $workshop['status'] == 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                                      </select>
-                                  </div>
-                                    
-                                  <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                      <button type="submit" name="updateWorkshop" class="btn btn-primary brand-bg-color">Save Changes</button>
-                                  </div>
-                              </form>
+                  <!-- Modal for editing workshop -->
+                  <div class="modal fade" id="editModal<?= $workshop['workshop_id'] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $workshop['workshop_id'] ?>" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-lg">
+                          <div class="modal-content">
+                              <div class="modal-header brand-bg-color text-white">
+                                  <h5 class="modal-title" id="editModalLabel<?= $workshop['workshop_id'] ?>"><i class="bi bi-pencil-square me-2"></i>Edit Workshop</h5>
+                                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                  <form action="../controllers/controller.php" method="POST" enctype="multipart/form-data">
+                                      <input type="hidden" name="workshop_id" value="<?= $workshop['workshop_id'] ?>">
+                                      <input type="hidden" name="old_banner" value="<?= $workshop['banner'] ?>">
+                                      <div class="mb-3">
+                                          <label for="title" class="form-label">Judul</label>
+                                          <input type="text" class="form-control" id="title" name="title" value="<?= $workshop['title'] ?>" required>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="description" class="form-label">Deskripsi</label>
+                                          <textarea class="form-control" id="description" name="description" required><?= $workshop['description'] ?></textarea>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="banner" class="form-label">Banner</label>
+                                          <input type="file" class="form-control" id="banner" name="banner">
+                                          <small class="text-muted">Biarkan kosong jika tidak ingin mengubah banner</small>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="training_overview" class="form-label">Gambaran Pelatihan</label>
+                                          <textarea class="form-control" id="training_overview" name="training_overview" required><?= $workshop['training_overview'] ?></textarea>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="trained_competencies" class="form-label">Kompetensi</label>
+                                          <textarea class="form-control" id="trained_competencies" name="trained_competencies" required><?= $workshop['trained_competencies'] ?></textarea>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="training_session" class="form-label">Sesi</label>
+                                          <input type="text" class="form-control" id="training_session" name="training_session" value="<?= $workshop['training_session'] ?>" required>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="requirements" class="form-label">Persyaratan</label>
+                                          <textarea class="form-control" id="requirements" name="requirements" required><?= $workshop['requirements'] ?></textarea>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="benefits" class="form-label">Manfaat</label>
+                                          <textarea class="form-control" id="benefits" name="benefits" required><?= $workshop['benefits'] ?></textarea>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="price" class="form-label">Harga</label>
+                                          <input type="number" class="form-control" id="price" name="price" value="<?= $workshop['price'] ?>" required>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="location" class="form-label">Lokasi</label>
+                                          <input type="text" class="form-control" id="location" name="location" value="<?= $workshop['location'] ?>" required>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="start_date" class="form-label">Tanggal Mulai</label>
+                                          <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="<?= date('Y-m-d\TH:i', strtotime($workshop['start_date'])) ?>" required>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="end_date" class="form-label">Tanggal Selesai</label>
+                                          <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="<?= date('Y-m-d\TH:i', strtotime($workshop['end_date'])) ?>" required>
+                                      </div>
+                                        
+                                      <div class="mb-3">
+                                          <label for="status" class="form-label">Status</label>
+                                          <select class="form-select" id="status" name="status" required>
+                                              <option value="active" <?= $workshop['status'] == 'active' ? 'selected' : '' ?>>Aktif</option>
+                                              <option value="inactive" <?= $workshop['status'] == 'inactive' ? 'selected' : '' ?>>Tidak Aktif</option>
+                                              <option value="cancelled" <?= $workshop['status'] == 'cancelled' ? 'selected' : '' ?>>Dibatalkan</option>
+                                          </select>
+                                      </div>
+                                        
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                          <button type="submit" name="updateWorkshop" class="btn btn-primary brand-bg-color">Simpan Perubahan</button>
+                                      </div>
+                                  </form>
+                              </div>
                           </div>
                       </div>
                   </div>
+
+
+                    <?php } ?>
+                    </tbody>
+
+                    </table>
+                  </div>
+
+                </div>
               </div>
-
-
-                <?php } ?>
-                </tbody>
-
-                </table>
-              </div>
-
             </div>
+            <!-- Full side columns -->
+
+
           </div>
-        </div>
-        <!-- Full side columns -->
-
-
-      </div>
-    </section>  </main>
-  </main><!-- End #main -->
+    </section>  
+  </main>
+  <!-- End #main -->
 
   <?php require "modals.php";?>
 
